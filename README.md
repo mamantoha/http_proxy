@@ -26,7 +26,7 @@ server.listen
 ## Development
 
 * [x] Basic HTTP Proxy: GET, POST, PUT, DELETE support
-* [ ] Basic HTTP Proxy: OPTIONS support
+* [x] Basic HTTP Proxy: OPTIONS support
 * [ ] HTTPS Proxy: CONNECT support
 * [ ] MITM HTTPS Proxy
 

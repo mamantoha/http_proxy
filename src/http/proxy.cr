@@ -1,6 +1,6 @@
 require "http/client"
 require "http/server"
-require "./proxy/handlers/proxy_handler"
+require "./proxy/handler"
 
 class HTTP::Proxy < HTTP::Server
 
@@ -50,7 +50,7 @@ class HTTP::Proxy < HTTP::Server
   end
 
   def self.build_middleware(handler : (Context ->)? = nil)
-    proxy_handler = HTTP::ProxyHandler.new
+    proxy_handler = HTTP::Proxy::Handler.new
     proxy_handler.next = handler if handler
     proxy_handler
   end

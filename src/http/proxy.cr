@@ -31,22 +31,22 @@ class HTTP::Proxy < HTTP::Server
 
   def initialize(@host : String, @port : Int32, &handler : Context ->)
     handler = HTTP::Proxy.build_middleware handler
-    @processor = RequestProcessor.new(handler)
+    @processor = RequestProcessor.new handler
   end
 
   def initialize(@host : String, @port : Int32, handlers : Array(HTTP::Handler), &handler : Context ->)
-    handler = HTTP::Server.build_middleware handlers, handler
-    @processor = RequestProcessor.new(handler)
+    handler = HTTP::Proxy.build_middleware handlers, handler
+    @processor = RequestProcessor.new handler
   end
 
   def initialize(@host : String, @port : Int32, handlers : Array(HTTP::Handler))
-    handler = HTTP::Server.build_middleware handlers
-    @processor = RequestProcessor.new(handler)
+    handler = HTTP::Proxy.build_middleware handlers
+    @processor = RequestProcessor.new handler
   end
 
   def initialize(@host : String, @port : Int32, handler : HTTP::Handler | HTTP::Handler::Proc)
     handler = HTTP::Proxy.build_middleware handler
-    @processor = RequestProcessor.new(handler)
+    @processor = RequestProcessor.new handler
   end
 
   def self.build_middleware(handler : (Context ->)? = nil)

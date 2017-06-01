@@ -1,6 +1,5 @@
 class HTTP::Proxy < HTTP::Server
   class Context < HTTP::Server::Context
-
     def perform
       # perform only once
       return if @performed
@@ -34,7 +33,6 @@ class HTTP::Proxy < HTTP::Server
           upstream.close
           downstream.close
         end
-
       else
         uri = URI.parse @request.resource
         client = HTTP::Client.new uri

@@ -28,7 +28,7 @@ server.listen
 * [x] Basic HTTP Proxy: GET, POST, PUT, DELETE support
 * [x] Basic HTTP Proxy: OPTIONS support
 * [x] HTTPS Proxy: CONNECT support
-* [ ] Make context.request & context.response writable
+* [x] Make context.request & context.response writable
 * [ ] MITM HTTPS Proxy
 
 ## Contributing

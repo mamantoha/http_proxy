@@ -4,6 +4,6 @@ version: 0.1.0
 authors:
   - Theo Li <bbtfrr@gmail.com>
 
-crystal: 0.20.5
+crystal: 0.23.1
 
 license: MIT

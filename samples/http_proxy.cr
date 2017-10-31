@@ -19,9 +19,11 @@ server = HTTP::Proxy.new(host, port, handlers: [
 ]) do |context|
   context.perform
 
-  # context.response.content_type = "text/plain"
-  # context.response.clear
-  # context.response.puts "Hello world! The time is #{Time.now}"
+  # if context.response
+  #   context.response.content_type = "text/plain"
+  #   context.response.clear
+  #   context.response.puts "This content was proxied! The time is #{Time.now}"
+  # end
 end
 
 puts "Listening on http://#{host}:#{port}"

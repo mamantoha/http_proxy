@@ -4,7 +4,7 @@ require "./proxy/handler"
 require "./proxy/response"
 
 class HTTP::Proxy < HTTP::Server
- def initialize(@host : String, @port : Int32)
+  def initialize(@host : String, @port : Int32)
     handler = HTTP::Proxy.build_middleware
     @processor = RequestProcessor.new handler
   end

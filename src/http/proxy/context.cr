@@ -1,6 +1,5 @@
 class HTTP::Proxy < HTTP::Server
   class Context < HTTP::Server::Context
-
     def perform
       # perform only once
       return if @performed
@@ -28,10 +27,14 @@ class HTTP::Proxy < HTTP::Server
       else
         uri = URI.parse(@request.resource)
         client = HTTP::Client.new(uri)
+        request.headers.delete("Accept-Encoding")
+
         response = client.exec(@request)
+        response.headers.delete("Content-Encoding")
+
         @response.headers.merge!(response.headers)
         @response.status_code = response.status_code
-        @response.print(response.body)
+        @response.puts(response.body)
       end
     end
   end

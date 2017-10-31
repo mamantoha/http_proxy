@@ -4,27 +4,7 @@ require "./proxy/handler"
 require "./proxy/response"
 
 class HTTP::Proxy < HTTP::Server
-  def self.new(port)
-    new("127.0.0.1", port)
-  end
-
-  def self.new(port, &handler : HTTP::Proxy::Handler::Proc)
-    new("127.0.0.1", port, &handler)
-  end
-
-  def self.new(port, handlers : Array(HTTP::Handler), &handler : HTTP::Proxy::Handler::Proc)
-    new("127.0.0.1", port, handlers, &handler)
-  end
-
-  def self.new(port, handlers : Array(HTTP::Handler))
-    new("127.0.0.1", port, handlers)
-  end
-
-  def self.new(port, handler)
-    new("127.0.0.1", port, handler)
-  end
-
-  def initialize(@host : String, @port : Int32)
+ def initialize(@host : String, @port : Int32)
     handler = HTTP::Proxy.build_middleware
     @processor = RequestProcessor.new handler
   end

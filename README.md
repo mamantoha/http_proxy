@@ -1,4 +1,4 @@
-# proxy
+# HTTP::Proxy::Server
 
 A HTTP Proxy written in Crystal inspired by Ruby's WEBrick::HTTPProxyServer
 
@@ -22,7 +22,6 @@ server = HTTP::Proxy::Server.new
 puts "Listening on http://#{server.host}:#{server.port}"
 server.listen
 ```
-
 
 ```crystal
 require "http_proxy_server"
@@ -60,7 +59,7 @@ server.listen
 
 ## Contributing
 
-1. Fork it ( https://github.com/bbtfr/proxy/fork )
+1. Fork it ( https://github.com/mamantoha/http_proxy_server/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)

@@ -4,29 +4,31 @@ require "./proxy/handler"
 require "./proxy/response"
 
 class HTTP::Proxy < HTTP::Server
-  def initialize(@host : String, @port : Int32)
+  getter :host, :port
+
+  def initialize(@host = "127.0.0.1", @port = 8080)
     handler = HTTP::Proxy.build_middleware
-    @processor = RequestProcessor.new handler
+    @processor = RequestProcessor.new(handler)
   end
 
-  def initialize(@host : String, @port : Int32, &handler : HTTP::Proxy::Handler::Proc)
-    handler = HTTP::Proxy.build_middleware handler
-    @processor = RequestProcessor.new handler
+  def initialize(@host = "127.0.0.1", @port = 8080, &handler : HTTP::Proxy::Handler::Proc)
+    handler = HTTP::Proxy.build_middleware(handler)
+    @processor = RequestProcessor.new(handler)
   end
 
-  def initialize(@host : String, @port : Int32, handlers : Array(HTTP::Handler), &handler : HTTP::Proxy::Handler::Proc)
-    handler = HTTP::Proxy.build_middleware handlers, handler
-    @processor = RequestProcessor.new handler
+  def initialize(@host = "127.0.0.1", @port = 8080, *, handlers : Array(HTTP::Handler), &handler : HTTP::Proxy::Handler::Proc)
+    handler = HTTP::Proxy.build_middleware(handlers, handler)
+    @processor = RequestProcessor.new(handler)
   end
 
-  def initialize(@host : String, @port : Int32, handlers : Array(HTTP::Handler))
-    handler = HTTP::Proxy.build_middleware handlers
-    @processor = RequestProcessor.new handler
+  def initialize(@host = "127.0.0.1", @port = 8080, *, handlers : Array(HTTP::Handler))
+    handler = HTTP::Proxy.build_middleware(handlers)
+    @processor = RequestProcessor.new(handler)
   end
 
-  def initialize(@host : String, @port : Int32, handler : HTTP::Handler | HTTP::Proxy::Handler::Proc)
-    handler = HTTP::Proxy.build_middleware handler
-    @processor = RequestProcessor.new handler
+  def initialize(@host = "127.0.0.1", @port = 8080, *, handler : HTTP::Handler | HTTP::Proxy::Handler::Proc)
+    handler = HTTP::Proxy.build_middleware(handler)
+    @processor = RequestProcessor.new(handler)
   end
 
   def self.build_middleware(handler : HTTP::Proxy::Handler::Proc? = nil)
@@ -36,7 +38,7 @@ class HTTP::Proxy < HTTP::Server
   end
 
   def self.build_middleware(handlers, last_handler : HTTP::Proxy::Handler::Proc? = nil)
-    proxy_handler = build_middleware last_handler
+    proxy_handler = build_middleware(last_handler)
     return proxy_handler if handlers.empty?
 
     handlers.each_cons(2) do |group|

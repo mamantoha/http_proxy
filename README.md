@@ -15,11 +15,38 @@ dependencies:
 ## Usage
 
 ```crystal
-require "http/proxy"
+require "proxy"
 
-server = HTTP::Proxy.new(8080)
+server = HTTP::Proxy.new
 
-puts "Listening on http://127.0.0.1:8080"
+puts "Listening on http://#{server.host}:#{server.port}"
+server.listen
+```
+
+
+```crystal
+require "proxy"
+
+host = "192.168.0.1"
+port = 3128
+
+OptionParser.parse! do |opts|
+  opts.on("-h HOST", "--host HOST", "define host to run server") do |opt|
+    host = opt
+  end
+
+  opts.on("-p PORT", "--port PORT", "define port to run server") do |opt|
+    port = opt.to_i
+  end
+end
+
+server = HTTP::Proxy.new(host, port, handlers: [
+  HTTP::LogHandler.new,
+]) do |context|
+  context.perform
+end
+
+puts "Listening on http://#{server.host}:#{server.port}"
 server.listen
 ```
 

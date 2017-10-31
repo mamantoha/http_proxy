@@ -9,15 +9,15 @@ Add this to your application's `shard.yml`:
 ```yaml
 dependencies:
   proxy:
-    github: bbtfr/proxy.cr
+    github: mamantoha/http_proxy_server
 ```
 
 ## Usage
 
 ```crystal
-require "proxy"
+require "http_proxy_server"
 
-server = HTTP::Proxy.new
+server = HTTP::Proxy::Server.new
 
 puts "Listening on http://#{server.host}:#{server.port}"
 server.listen
@@ -25,7 +25,7 @@ server.listen
 
 
 ```crystal
-require "proxy"
+require "http_proxy_server"
 
 host = "192.168.0.1"
 port = 3128
@@ -40,7 +40,7 @@ OptionParser.parse! do |opts|
   end
 end
 
-server = HTTP::Proxy.new(host, port, handlers: [
+server = HTTP::Proxy::Server.new(host, port, handlers: [
   HTTP::LogHandler.new,
 ]) do |context|
   context.perform
@@ -69,3 +69,4 @@ server.listen
 ## Contributors
 
 - [bbtfr](https://github.com/bbtfr) Theo Li - creator, maintainer
+- [mamantoha](https://github.com/mamantoha) Anton Maminov - maintainer

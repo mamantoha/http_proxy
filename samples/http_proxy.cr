@@ -1,4 +1,4 @@
-require "../http/proxy"
+require "../http/proxy/server"
 require "option_parser"
 
 host = "127.0.0.1"
@@ -14,7 +14,7 @@ OptionParser.parse! do |opts|
   end
 end
 
-server = HTTP::Proxy.new(host, port, handlers: [
+server = HTTP::Proxy::Server.new(host, port, handlers: [
   HTTP::LogHandler.new,
 ]) do |context|
   context.perform

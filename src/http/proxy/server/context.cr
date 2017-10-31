@@ -1,7 +1,6 @@
-class HTTP::Proxy < HTTP::Server
+class HTTP::Proxy::Server < HTTP::Server
   class Context < HTTP::Server::Context
     def perform
-      # perform only once
       return if @performed
 
       @performed = true

@@ -1,2 +1,0 @@
-require "./proxy/*"
-require "./http/*"

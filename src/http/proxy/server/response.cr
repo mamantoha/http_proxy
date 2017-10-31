@@ -1,4 +1,4 @@
-class HTTP::Server
+class HTTP::Proxy::Server
   class Response
     def clear
       @upgraded = false

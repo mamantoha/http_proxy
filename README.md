@@ -8,7 +8,7 @@ Add this to your application's `shard.yml`:
 
 ```yaml
 dependencies:
-  proxy:
+  http_proxy_server:
     github: mamantoha/http_proxy_server
 ```
 

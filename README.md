@@ -15,7 +15,7 @@ dependencies:
 ## Usage
 
 ```crystal
-require "http_proxy_server"
+require "http/proxy/server"
 
 server = HTTP::Proxy::Server.new
 
@@ -24,7 +24,7 @@ server.listen
 ```
 
 ```crystal
-require "http_proxy_server"
+require "http/proxy/server"
 
 host = "192.168.0.1"
 port = 3128

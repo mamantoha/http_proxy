@@ -1,5 +1,5 @@
-name: proxy
-version: 0.1.0
+name: http_proxy_server
+version: 0.2.0
 
 authors:
   - Theo Li <bbtfrr@gmail.com>

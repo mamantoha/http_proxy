@@ -1,5 +1,6 @@
 # 0.3.0
 
+* Detach the fork and turn it into a standalone repository on GitHub
 * Change shard name to `http_proxy`
 * Add proxy client
 * Add project to Travis CI

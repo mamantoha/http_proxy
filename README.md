@@ -1,5 +1,7 @@
 # HTTP::Proxy::Server
 
+[![Build Status](http://img.shields.io/travis/mamantoha/http_proxy_server.svg?style=flat)](https://travis-ci.org/mamantoha/http_proxy_server)
+
 A HTTP Proxy written in Crystal inspired by Ruby's WEBrick::HTTPProxyServer
 
 ## Installation

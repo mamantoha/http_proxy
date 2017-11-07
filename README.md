@@ -1,6 +1,6 @@
 # HTTP::Proxy
 
-[![Build Status](http://img.shields.io/travis/mamantoha/http_proxy_server.svg?style=flat)](https://travis-ci.org/mamantoha/http_proxy_server)
+[![Build Status](http://img.shields.io/travis/mamantoha/http_proxy.svg?style=flat)](https://travis-ci.org/mamantoha/http_proxy)
 
 A HTTP Proxy server and client written in Crystal
 

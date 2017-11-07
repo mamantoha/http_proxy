@@ -1,2 +1,2 @@
 require "spec"
-require "../src/proxy"
+require "../src/http_proxy"

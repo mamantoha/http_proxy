@@ -25,6 +25,7 @@ server.listen
 
 ```crystal
 require "http_proxy_server"
+require "option_parser"
 
 host = "192.168.0.1"
 port = 3128

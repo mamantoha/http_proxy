@@ -1,8 +1,8 @@
-# HTTP::Proxy::Server
+# HTTP::Proxy
 
 [![Build Status](http://img.shields.io/travis/mamantoha/http_proxy_server.svg?style=flat)](https://travis-ci.org/mamantoha/http_proxy_server)
 
-A HTTP Proxy written in Crystal inspired by Ruby's WEBrick::HTTPProxyServer
+A HTTP Proxy server and client written in Crystal
 
 ## Installation
 
@@ -10,14 +10,16 @@ Add this to your application's `shard.yml`:
 
 ```yaml
 dependencies:
-  http_proxy_server:
-    github: mamantoha/http_proxy_server
+  http_proxy:
+    github: mamantoha/http_proxy
 ```
 
 ## Usage
 
+### Server
+
 ```crystal
-require "http_proxy_server"
+require "http_proxy"
 
 server = HTTP::Proxy::Server.new
 
@@ -26,7 +28,7 @@ server.listen
 ```
 
 ```crystal
-require "http_proxy_server"
+require "http_proxy"
 require "option_parser"
 
 host = "192.168.0.1"
@@ -52,7 +54,21 @@ puts "Listening on http://#{server.host}:#{server.port}"
 server.listen
 ```
 
+### Client
+
+```crystal
+require "http_proxy"
+
+proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080)
+
+client = HTTP::Client.new("httpbin.org")
+client.set_proxy(proxy_client)
+response = client.get("https://httpbin.org/get")
+```
+
 ## Development
+
+### Proxy server
 
 * [x] Basic HTTP Proxy: GET, POST, PUT, DELETE support
 * [x] Basic HTTP Proxy: OPTIONS support
@@ -60,9 +76,16 @@ server.listen
 * [x] Make context.request & context.response writable
 * [ ] MITM HTTPS Proxy
 
+### Proxy client
+
+* [x] Basic HTTP Proxy: GET, POST, PUT, DELETE support
+* [x] Basic HTTP Proxy: OPTIONS support
+* [x] HTTPS Proxy: CONNECT support
+* [x] Proxy: Basic Auth
+
 ## Contributing
 
-1. Fork it ( https://github.com/mamantoha/http_proxy_server/fork )
+1. Fork it ( https://github.com/mamantoha/http_proxy/fork )
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)

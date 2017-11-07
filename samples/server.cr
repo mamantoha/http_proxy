@@ -1,4 +1,4 @@
-require "../http/proxy/server"
+require "../src/http_proxy"
 require "option_parser"
 
 host = "127.0.0.1"

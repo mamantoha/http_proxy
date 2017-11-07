@@ -1,4 +1,4 @@
-require "../http/proxy/client"
+require "../src/http_proxy"
 require "option_parser"
 
 host = "127.0.0.1"
@@ -14,4 +14,9 @@ OptionParser.parse! do |opts|
   end
 end
 
-client = HTTP::Proxy::Client.new(host, port)
+proxy_client = HTTP::Proxy::Client.new(host, port)
+
+client = HTTP::Client.new("httpbin.org")
+client.set_proxy(proxy_client)
+response = client.get("https://httpbin.org/get")
+puts response.body

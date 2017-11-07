@@ -56,14 +56,33 @@ server.listen
 
 ### Client
 
+Make HTTP request:
+
 ```crystal
 require "http_proxy"
 
 proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080)
 
-client = HTTP::Client.new("httpbin.org")
+uri = URI.parse("http://httpbin.org")
+client = HTTP::Client.new(uri)
 client.set_proxy(proxy_client)
-response = client.get("https://httpbin.org/get")
+response = client.get("http://httpbin.org/get")
+```
+
+**Note:** you should send full URL instead of path when using HTTP proxy.
+
+Make HTTPS request:
+
+```crystal
+require "http_proxy"
+
+proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080)
+
+uri = URI.parse("https://httpbin.org")
+response = HTTP::Client.new(uri) do |client|
+  client.set_proxy(proxy_client)
+  client.get("/get")
+end
 ```
 
 ## Development

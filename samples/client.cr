@@ -35,8 +35,7 @@ puts response.body
 # Make HTTP request
 uri = URI.parse("http://httpbin.org")
 client = HTTP::Client.new(uri)
-# client.set_proxy(proxy_client)
-# response = client.get("http://httpbin.org/get")
-response = client.get("/get")
+client.set_proxy(proxy_client)
+response = client.get("http://httpbin.org/get")
 puts response.status_code
 puts response.body

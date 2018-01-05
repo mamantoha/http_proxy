@@ -1,10 +1,10 @@
 name: http_proxy
-version: 0.3.0
+version: 0.3.1
 
 authors:
   - Theo Li <bbtfrr@gmail.com>
   - Anton Maminov <anton.maminov@gmail.com>
 
-crystal: 0.23.1
+crystal: 0.24.1
 
 license: MIT

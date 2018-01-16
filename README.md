@@ -56,6 +56,18 @@ puts "Listening on http://#{server.host}:#{server.port}"
 server.listen
 ```
 
+#### Basic Authentication
+
+```crystal
+server = HTTP::Proxy::Server.new("127.0.0.1", 8080, handlers: [
+  HTTP::LogHandler.new,
+  HTTP::Proxy::Server::BasicAuth.new("user", "passwd"),
+]) do |context|
+  context.request.headers.add("X-Forwarded-For", "127.0.0.1")
+  context.perform
+end
+```
+
 ### Client
 
 Make HTTP request:
@@ -71,9 +83,9 @@ client.set_proxy(proxy_client)
 response = client.get("http://httpbin.org/get")
 ```
 
-**Note:** you should send full URL instead of path when using HTTP proxy.
+#### Make HTTPS request:
 
-Make HTTPS request:
+**Note:** you should send full URL instead of path when using HTTP proxy.
 
 ```crystal
 require "http_proxy"
@@ -87,6 +99,21 @@ response = HTTP::Client.new(uri) do |client|
 end
 ```
 
+#### Basic Authentication
+
+```crystal
+uri = URI.parse("http://httpbin.org")
+proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080, username: "user", password: "passwd")
+
+response = HTTP::Client.new(uri) do |client|
+  client.set_proxy(proxy_client)
+  client.get("http://httpbin.org/get")
+end
+
+puts response.status_code
+puts response.body
+```
+
 ## Development
 
 ### Proxy server
@@ -95,6 +122,7 @@ end
 * [x] Basic HTTP Proxy: OPTIONS support
 * [x] HTTPS Proxy: CONNECT support
 * [x] Make context.request & context.response writable
+* [x] Basic Authentication
 * [ ] MITM HTTPS Proxy
 
 ### Proxy client
@@ -102,7 +130,7 @@ end
 * [x] Basic HTTP Proxy: GET, POST, PUT, DELETE support
 * [x] Basic HTTP Proxy: OPTIONS support
 * [x] HTTPS Proxy: CONNECT support
-* [x] Proxy: Basic Auth
+* [x] Basic Authentication
 
 ## Contributing
 

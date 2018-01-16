@@ -16,14 +16,14 @@ end
 
 proxy_client = HTTP::Proxy::Client.new(host, port)
 
-# Make HTTP request w/o proxy
+puts "Make HTTP request w/o proxy"
 uri = URI.parse("http://httpbin.org")
 client = HTTP::Client.new(uri)
 response = client.get("/get")
 puts response.status_code
 puts response.body
 
-# Make HTTPS request
+puts "Make HTTPS request"
 uri = URI.parse("https://httpbin.org")
 response = HTTP::Client.new(uri) do |client|
   client.set_proxy(proxy_client)
@@ -32,7 +32,7 @@ end
 puts response.status_code
 puts response.body
 
-# Make HTTP request
+puts "Make HTTP request"
 uri = URI.parse("http://httpbin.org")
 client = HTTP::Client.new(uri)
 client.set_proxy(proxy_client)

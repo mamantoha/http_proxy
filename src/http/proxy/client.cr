@@ -38,6 +38,7 @@ module HTTP
 
         if tls
           socket << "CONNECT #{host}:#{port} HTTP/1.0\r\n"
+          socket << "Host: #{host}:#{port}\r\n"
 
           if @username
             credentials = Base64.strict_encode("#{@username}:#{@password}")
@@ -99,12 +100,12 @@ module HTTP
 
       begin
         @socket = proxy.open(host: @host, port: @port, tls: @tls, connection_options: proxy_connection_options)
+      rescue ex : IO::Error
+        raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")
+      end
 
-        if proxy.username
-          proxy_basic_auth(proxy.username, proxy.password)
-        end
-      rescue IO::Error
-        @socket = nil
+      if proxy.username
+        proxy_basic_auth(proxy.username, proxy.password)
       end
 
       @socket

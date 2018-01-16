@@ -1,5 +1,6 @@
 require "./server/handler"
 require "./server/response"
+require "./server/basic_auth"
 
 module HTTP
   # :nodoc:
@@ -7,28 +8,26 @@ module HTTP
     class Server
       getter :host, :port
 
-      def initialize(@host = "127.0.0.1", @port = 8080)
+      def initialize(@host : String, @port : Int32)
         handler = build_middleware
         @processor = RequestProcessor.new(handler)
       end
 
-      def initialize(@host = "127.0.0.1", @port = 8080, &handler : Handler::Proc)
-        handler = build_middleware(handler)
+      def initialize(@host : String, @port : Int32, &handler : Context ->)
         @processor = RequestProcessor.new(handler)
       end
 
-      def initialize(@host = "127.0.0.1", @port = 8080, *, handlers : Array(HTTP::Handler), &handler : Handler::Proc)
+      def initialize(@host : String, @port : Int32, handlers : Array(HTTP::Handler), &handler : Context ->)
         handler = build_middleware(handlers, handler)
         @processor = RequestProcessor.new(handler)
       end
 
-      def initialize(@host = "127.0.0.1", @port = 8080, *, handlers : Array(HTTP::Handler))
+      def initialize(@host : String, @port : Int32, handlers : Array(HTTP::Handler))
         handler = build_middleware(handlers)
         @processor = RequestProcessor.new(handler)
       end
 
-      def initialize(@host = "127.0.0.1", @port = 8080, *, handler : HTTP::Handler | Handler::Proc)
-        handler = build_middleware(handler)
+      def initialize(@host : String, @port : Int32, handler : HTTP::Handler | HTTP::Handler::Proc)
         @processor = RequestProcessor.new(handler)
       end
 

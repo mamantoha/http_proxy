@@ -72,6 +72,8 @@ end
 
 Make HTTP request:
 
+**Note:** you should send full URL instead of path when using HTTP proxy.
+
 ```crystal
 require "http_proxy"
 
@@ -84,8 +86,6 @@ response = client.get("http://httpbin.org/get")
 ```
 
 #### Make HTTPS request:
-
-**Note:** you should send full URL instead of path when using HTTP proxy.
 
 ```crystal
 require "http_proxy"

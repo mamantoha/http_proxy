@@ -4,7 +4,7 @@ require "option_parser"
 host = "127.0.0.1"
 port = 8080
 username = "user"
-password = "passwd"
+password = "1234"
 
 OptionParser.parse! do |opts|
   opts.on("-h HOST", "--host HOST", "define host to run server") do |opt|
@@ -14,6 +14,15 @@ OptionParser.parse! do |opts|
   opts.on("-p PORT", "--port PORT", "define port to run server") do |opt|
     port = opt.to_i
   end
+
+  opts.on("-u USER", "--user USER", "define user for authentication") do |opt|
+    username = opt
+  end
+
+  opts.on("--pass PASSWORD", "define password for authentication") do |opt|
+    password = opt
+  end
+
 end
 
 server = HTTP::Proxy::Server.new(host, port, handlers: [
@@ -25,4 +34,5 @@ server = HTTP::Proxy::Server.new(host, port, handlers: [
 end
 
 puts "Listening on http://#{host}:#{port}"
+puts "Use #{username}:#{password} for authentication"
 server.listen

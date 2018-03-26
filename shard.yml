@@ -7,4 +7,9 @@ authors:
 
 crystal: 0.24.2
 
+development_dependencies:
+  kemal:
+    github: sdogruyol/kemal
+    version: ~> 0.22.0
+
 license: MIT

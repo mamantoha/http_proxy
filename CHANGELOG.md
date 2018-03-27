@@ -1,3 +1,7 @@
+# 0.3.3
+
+* Fixed an issue with HTTP resource when proxy server which initialized without handlers can't properly read a response
+
 # 0.3.2
 
 * Fix compatibility with Kemal

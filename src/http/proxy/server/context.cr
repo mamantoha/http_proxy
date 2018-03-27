@@ -28,6 +28,8 @@ class HTTP::Proxy::Server < HTTP::Server
         client = HTTP::Client.new(uri)
         response = client.exec(@request)
 
+        @response.headers.merge!(response.headers)
+        @response.status_code = response.status_code
         @response.puts(response.body)
       end
     end

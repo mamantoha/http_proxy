@@ -11,6 +11,7 @@ class HTTP::Proxy::Server::Handler
     request = context.request
     response = context.response
     context = Context.new(request, response)
+    call_next(context)
 
     context.perform
   end

@@ -3,7 +3,7 @@ require "./context"
 class HTTP::Proxy::Server::Handler
   include HTTP::Handler
 
-  property next : Handler | Proc | Nil
+  property next : HTTP::Handler | Proc | Nil
 
   alias Proc = Context ->
 

@@ -1,3 +1,11 @@
+# 0.3.2
+
+* Fix compatibility with Kemal
+
+# 0.3.1
+
+* minor bug fixes
+
 # 0.3.0
 
 * Detach the fork and turn it into a standalone repository on GitHub

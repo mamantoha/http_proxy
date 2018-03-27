@@ -31,21 +31,18 @@ module HTTP
         @processor = RequestProcessor.new(handler)
       end
 
-      private def build_middleware(handler : Handler::Proc? = nil)
+      private def build_middleware(handler : (Context ->)? = nil)
         proxy_handler = Handler.new
         proxy_handler.next = handler if handler
         proxy_handler
       end
 
-      private def build_middleware(handlers, last_handler : Handler::Proc? = nil)
+      private def build_middleware(handlers, last_handler : (Context ->)? = nil)
         proxy_handler = build_middleware(last_handler)
         return proxy_handler if handlers.empty?
 
-        handlers.each_cons(2) do |group|
-          group[0].next = group[1]
-        end
+        0.upto(handlers.size - 2) { |i| handlers[i].next = handlers[i + 1] }
         handlers.last.next = proxy_handler if proxy_handler
-
         handlers.first
       end
     end

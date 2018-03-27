@@ -26,13 +26,8 @@ class HTTP::Proxy::Server < HTTP::Server
       else
         uri = URI.parse(@request.resource)
         client = HTTP::Client.new(uri)
-        request.headers.delete("Accept-Encoding")
-
         response = client.exec(@request)
-        response.headers.delete("Content-Encoding")
 
-        @response.headers.merge!(response.headers)
-        @response.status_code = response.status_code
         @response.puts(response.body)
       end
     end

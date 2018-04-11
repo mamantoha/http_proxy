@@ -6,7 +6,7 @@ port = 8080
 
 spawn do
   server = HTTP::Proxy::Server.new(host, port, handlers: [
-    HTTP::LogHandler.new
+    HTTP::LogHandler.new,
   ]) do |context|
     context.request.headers.add("X-Forwarded-For", host)
     context.perform

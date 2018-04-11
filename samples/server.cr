@@ -22,7 +22,6 @@ OptionParser.parse! do |opts|
   opts.on("--pass PASSWORD", "define password for authentication") do |opt|
     password = opt
   end
-
 end
 
 server = HTTP::Proxy::Server.new(host, port, handlers: [

@@ -1,8 +1,7 @@
 language: crystal
 crystal:
   - latest
-  - nightly
 
-matrix:
-  allow_failures:
-    - crystal: nightly
+script:
+  - crystal spec
+  - crystal tool format src/ --check

@@ -7,6 +7,6 @@ require "./http/proxy/client"
 
 module HTTP
   module Proxy
-    VERSION = "0.3.4"
+    VERSION = "0.3.5"
   end
 end

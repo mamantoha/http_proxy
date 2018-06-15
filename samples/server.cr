@@ -34,4 +34,5 @@ end
 
 puts "Listening on http://#{host}:#{port}"
 puts "Use #{username}:#{password} for authentication"
+server.bind_tcp(port)
 server.listen

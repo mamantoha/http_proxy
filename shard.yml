@@ -1,11 +1,11 @@
 name: http_proxy
-version: 0.3.4
+version: 0.3.5
 
 authors:
   - Theo Li <bbtfrr@gmail.com>
   - Anton Maminov <anton.maminov@gmail.com>
 
-crystal: 0.24.2
+crystal: 0.25
 
 development_dependencies:
   kemal:

@@ -13,6 +13,7 @@ def with_proxy_server(host = "127.0.0.1", port = 8080)
   end
 
   spawn do
+    server.bind_tcp(port)
     puts "start proxy server"
     server.listen
   end

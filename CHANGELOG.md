@@ -1,3 +1,7 @@
+# 0.3.5
+
+* Updates to Crystal 0.25
+
 # 0.3.3
 
 * Fixed an issue with HTTP resource when proxy server which initialized without handlers can't properly read a response

@@ -5,3 +5,4 @@ crystal:
 script:
   - crystal spec
   - crystal tool format src/ --check
+  - bin/ameba

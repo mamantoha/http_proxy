@@ -100,13 +100,15 @@ module HTTP
         raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")
       end
 
-      if proxy.username
+      if proxy.username && proxy.password
         proxy_basic_auth(proxy.username, proxy.password)
       end
 
       @socket
     end
 
+    # Configures this client to perform proxy basic authentication in every
+    # request.
     private def proxy_basic_auth(username : String?, password : String?)
       header = "Basic #{Base64.strict_encode("#{username}:#{password}")}"
       before_request do |request|

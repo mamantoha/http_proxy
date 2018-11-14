@@ -11,13 +11,17 @@ module HTTP
 
       getter tls : OpenSSL::SSL::Context::Client?
 
+      @dns_timeout : Float64?
+      @connect_timeout : Float64?
+      @read_timeout : Float64?
+
       record Response,
         version : String,
         code : Int32,
         reason : String,
         headers = {} of String => String
 
-      # Create a new socket factory that tunnels via the given host and  port.
+      # Creates a new socket factory that tunnels via the given host and port.
       # The following optional arguments are supported:
       #
       # * :username - the user name to use when authenticating to the proxy
@@ -25,15 +29,11 @@ module HTTP
       def initialize(@host, @port, *, @username = nil, @password = nil)
       end
 
-      # Return a new socket connected to the given host and port via the
+      # Returns a new socket connected to the given host and port via the
       # proxy that was requested when the socket factory was instantiated.
-      def open(host, port, tls = nil, connection_options = {} of Symbol => Float64 | Nil)
-        dns_timeout = connection_options.fetch(:dns_timeout, nil)
-        connect_timeout = connection_options.fetch(:connect_timeout, nil)
-        read_timeout = connection_options.fetch(:read_timeout, nil)
-
-        socket = TCPSocket.new(@host, @port, dns_timeout, connect_timeout)
-        socket.read_timeout = read_timeout if read_timeout
+      def open(host, port, tls = nil, *, @dns_timeout, @connect_timeout, @read_timeout)
+        socket = TCPSocket.new(@host, @port, @dns_timeout, @connect_timeout)
+        socket.read_timeout = @read_timeout if @read_timeout
         socket.sync = true
 
         if tls
@@ -88,7 +88,14 @@ module HTTP
       return unless proxy
 
       begin
-        @socket = proxy.open(host: @host, port: @port, tls: @tls, connection_options: proxy_connection_options)
+        @socket = proxy.open(
+          host: @host,
+          port: @port,
+          tls: @tls,
+          dns_timeout: @dns_timeout,
+          connect_timeout: @connect_timeout,
+          read_timeout: @read_timeout
+        )
       rescue ex : IO::Error
         raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")
       end
@@ -98,16 +105,6 @@ module HTTP
       end
 
       @socket
-    end
-
-    def proxy_connection_options
-      opts = {} of Symbol => Float64 | Nil
-
-      opts[:dns_timeout] = @dns_timeout
-      opts[:connect_timeout] = @connect_timeout
-      opts[:read_timeout] = @read_timeout
-
-      return opts
     end
 
     private def proxy_basic_auth(username : String?, password : String?)

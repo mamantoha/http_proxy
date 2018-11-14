@@ -11,18 +11,18 @@ module HTTP
 
       getter tls : OpenSSL::SSL::Context::Client?
 
+      record Response,
+        version : String,
+        code : Int32,
+        reason : String,
+        headers = {} of String => String
+
       # Create a new socket factory that tunnels via the given host and  port.
       # The following optional arguments are supported:
       #
       # * :username - the user name to use when authenticating to the proxy
       # * :password - the password to use when authenticating
-      def initialize(
-        @host : String,
-        @port : Int32,
-        *,
-        @username = nil,
-        @password = nil
-      )
+      def initialize(@host, @port, *, @username = nil, @password = nil)
       end
 
       # Return a new socket connected to the given host and port via the
@@ -50,7 +50,7 @@ module HTTP
 
           resp = parse_response(socket)
 
-          if resp[:code]? == 200
+          if resp.code == 200
             {% if !flag?(:without_openssl) %}
               if tls
                 tls_socket = OpenSSL::SSL::Socket::Client.new(socket, context: tls, sync_close: true, hostname: host)
@@ -68,28 +68,17 @@ module HTTP
         socket
       end
 
-      private def parse_response(socket)
-        resp = {} of Symbol => Int32 | String | Hash(String, String)
+      private def parse_response(socket) : Response?
+        version, code, reason = socket.gets.as(String).chomp.split(/ /, 3)
 
-        begin
-          version, code, reason = socket.gets.as(String).chomp.split(/ /, 3)
+        headers = {} of String => String
 
-          headers = {} of String => String
-
-          while (line = socket.gets.as(String)) && (line.chomp != "")
-            puts line
-            name, value = line.split(/:/, 2)
-            headers[name.strip] = value.strip
-          end
-
-          resp[:version] = version
-          resp[:code] = code.to_i
-          resp[:reason] = reason
-          resp[:headers] = headers
-        rescue
+        while (line = socket.gets.as(String)) && (line.chomp != "")
+          name, value = line.split(/:/, 2)
+          headers[name.strip] = value.strip
         end
 
-        return resp
+        Response.new(version, code.to_i, reason, headers)
       end
     end
   end

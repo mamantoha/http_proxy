@@ -7,7 +7,7 @@ class HTTP::Proxy::Server
 
     def call(context)
       if context.request.headers.has_key?("Proxy-Authorization")
-        method, enc = context.request.headers["Proxy-Authorization"].split
+        _, enc = context.request.headers["Proxy-Authorization"].split
         username, password = Base64.decode_string(enc).split(":")
         if authorized?(username, password)
           context.request.headers.delete("Proxy-Authorization")

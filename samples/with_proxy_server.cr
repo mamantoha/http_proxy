@@ -29,7 +29,7 @@ def with_proxy_server(host = "127.0.0.1", port = 8080)
   yield host, port, wants_close
 end
 
-with_proxy_server do |host, port, wants_close|
+with_proxy_server do |_host, _port, wants_close|
   puts "start proxy client"
 
   puts "HTTP Request:"

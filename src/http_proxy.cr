@@ -7,6 +7,6 @@ require "./http/proxy/client"
 
 module HTTP
   module Proxy
-    VERSION = "0.3.5"
+    VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
   end
 end

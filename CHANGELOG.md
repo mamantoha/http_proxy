@@ -1,3 +1,8 @@
+# 0.3.6
+
+* Updates to Crystal 0.27
+* Refactor Proxy Client
+
 # 0.3.5
 
 * Updates to Crystal 0.25

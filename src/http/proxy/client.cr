@@ -1,3 +1,11 @@
+require "http"
+require "socket"
+require "base64"
+
+{% if !flag?(:without_openssl) %}
+  require "openssl"
+{% end %}
+
 module HTTP
   # :nodoc:
   module Proxy

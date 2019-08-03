@@ -90,7 +90,7 @@ client.set_proxy(proxy_client)
 response = client.get("http://httpbin.org/get")
 ```
 
-#### Make HTTPS request:
+#### Make HTTPS request
 
 ```crystal
 require "http_proxy"
@@ -104,7 +104,7 @@ response = HTTP::Client.new(uri) do |client|
 end
 ```
 
-#### Basic Authentication
+#### Client Authentication
 
 ```crystal
 uri = URI.parse("http://httpbin.org")
@@ -139,7 +139,7 @@ puts response.body
 
 ## Contributing
 
-1. Fork it ( https://github.com/mamantoha/http_proxy/fork )
+1. Fork it (<https://github.com/mamantoha/http_proxy/fork>)
 2. Create your feature branch (git checkout -b my-new-feature)
 3. Commit your changes (git commit -am 'Add some feature')
 4. Push to the branch (git push origin my-new-feature)
@@ -147,5 +147,5 @@ puts response.body
 
 ## Contributors
 
-- [bbtfr](https://github.com/bbtfr) Theo Li - creator, maintainer
-- [mamantoha](https://github.com/mamantoha) Anton Maminov - maintainer
+* [bbtfr](https://github.com/bbtfr) Theo Li - creator, maintainer
+* [mamantoha](https://github.com/mamantoha) Anton Maminov - maintainer

@@ -1,3 +1,7 @@
+# 0.4.0
+
+* Compatibility with Crystal 0.30
+
 # 0.3.6
 
 * Updates to Crystal 0.27

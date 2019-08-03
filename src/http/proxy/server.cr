@@ -27,7 +27,7 @@ module HTTP
         @processor = RequestProcessor.new(handler)
       end
 
-      def initialize(@host : String, @port : Int32, handler : HTTP::Handler | HTTP::Handler::Proc)
+      def initialize(@host : String, @port : Int32, handler : HTTP::Handler | HTTP::Handler::HandlerProc)
         @processor = RequestProcessor.new(handler)
       end
 

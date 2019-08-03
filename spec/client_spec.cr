@@ -15,5 +15,22 @@ describe HTTP::Proxy::Client do
       (client.username).should eq("user")
       (client.password).should eq("password")
     end
+
+    context "HTTP::Client#set_proxy" do
+      it "should make request with proxy" do
+        with_proxy_server do |host, port, wants_close|
+          proxy_client = HTTP::Proxy::Client.new(host, port)
+
+          uri = URI.parse("http://httpbin.org")
+          client = HTTP::Client.new(uri)
+          client.set_proxy(proxy_client)
+          response = client.get("http://httpbin.org/get")
+
+          (response.status_code).should eq(200)
+        ensure
+          wants_close.send(nil)
+        end
+      end
+    end
   end
 end

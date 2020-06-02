@@ -18,9 +18,15 @@ class HTTP::Proxy::Server < HTTP::Server
           downstream = downstream.as(TCPSocket)
           downstream.sync = true
 
+          # FIXME broken in Crystal 0.35.0
+          # Reference: https://github.com/crystal-lang/crystal/pull/9243
           spawn do
-            spawn { IO.copy(upstream, downstream) }
-            spawn { IO.copy(downstream, upstream) }
+            spawn do
+              IO.copy(upstream, downstream)
+            end
+            spawn do
+              IO.copy(downstream, upstream)
+            end
           end
         end
       else

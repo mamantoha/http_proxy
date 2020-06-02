@@ -1,5 +1,4 @@
 require "./server/handler"
-require "./server/response"
 require "./server/basic_auth"
 
 module HTTP

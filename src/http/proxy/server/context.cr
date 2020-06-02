@@ -20,6 +20,8 @@ class HTTP::Proxy::Server < HTTP::Server
 
           # FIXME broken in Crystal 0.35.0
           # Reference: https://github.com/crystal-lang/crystal/pull/9243
+          # ?!
+          # https://github.com/crystal-lang/crystal/pull/9243/files#diff-acf23ce080d7cd430f3acb722d4d93b9R515
           spawn do
             spawn do
               IO.copy(upstream, downstream)

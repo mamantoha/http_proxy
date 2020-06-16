@@ -20,7 +20,7 @@ class HTTP::Proxy::Server < HTTP::Server
       upstream = TCPSocket.new(host, port)
 
       @response.upgrade do |downstream|
-        channel = Channel(Nil).new
+        channel = Channel(Nil).new(2)
 
         downstream = downstream.as(TCPSocket)
         downstream.sync = true
@@ -30,7 +30,7 @@ class HTTP::Proxy::Server < HTTP::Server
           transfer(downstream, upstream, channel)
         end
 
-        channel.receive
+        2.times { channel.receive }
       end
     end
 
@@ -38,7 +38,7 @@ class HTTP::Proxy::Server < HTTP::Server
       spawn do
         IO.copy(destination, source)
       rescue
-        # unhandled exception in spawn
+        # ignore unhandled exception in spawn
       ensure
         channel.send(nil)
       end

@@ -9,47 +9,55 @@ class HTTP::Proxy::Server < HTTP::Server
       when "OPTIONS"
         @response.headers["Allow"] = "OPTIONS,GET,HEAD,POST,PUT,DELETE,CONNECT"
       when "CONNECT"
-        host, port = @request.resource.split(":", 2)
+        handle_tunneling
+      else
+        handle_http
+      end
+    end
 
-        upstream = TCPSocket.new(host, port)
+    private def handle_tunneling
+      host, port = @request.resource.split(":", 2)
+      upstream = TCPSocket.new(host, port)
 
+      @response.upgrade do |downstream|
         channel = Channel(Nil).new
 
-        @response.reset
-        @response.upgrade do |downstream|
-          downstream = downstream.as(TCPSocket)
-          downstream.sync = true
+        downstream = downstream.as(TCPSocket)
+        downstream.sync = true
 
-          spawn do
-            spawn do
-              IO.copy(upstream, downstream)
-            rescue
-              channel.send(nil)
-            end
-
-            spawn do
-              IO.copy(downstream, upstream)
-              channel.send(nil)
-            end
-          end
-
-          channel.receive
+        spawn do
+          transfer(upstream, downstream, channel)
+          transfer(downstream, upstream, channel)
         end
-      else
-        uri = URI.parse(@request.resource)
-        client = HTTP::Client.new(uri)
 
-        @request.headers.delete("Accept-Encoding")
-
-        response = client.exec(@request)
-
-        response.headers.delete("Transfer-Encoding")
-        response.headers.delete("Content-Encoding")
-
-        @response.headers.merge!(response.headers)
-        @response.status_code = response.status_code
-        @response.puts(response.body)
+        channel.receive
       end
+    end
+
+    private def transfer(destination, source, channel)
+      spawn do
+        IO.copy(destination, source)
+      rescue
+        # unhandled exception in spawn
+      ensure
+        channel.send(nil)
+      end
+    end
+
+    private def handle_http
+      uri = URI.parse(@request.resource)
+      client = HTTP::Client.new(uri)
+
+      @request.headers.delete("Accept-Encoding")
+
+      response = client.exec(@request)
+
+      response.headers.delete("Transfer-Encoding")
+      response.headers.delete("Content-Encoding")
+
+      @response.headers.merge!(response.headers)
+      @response.status_code = response.status_code
+      @response.puts(response.body)
     end
   end
 end

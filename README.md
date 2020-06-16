@@ -75,7 +75,7 @@ end
 
 ### Client
 
-Make HTTP request:
+#### Make HTTP request
 
 **Note:** you should send full URL instead of path when using HTTP proxy.
 

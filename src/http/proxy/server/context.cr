@@ -13,23 +13,27 @@ class HTTP::Proxy::Server < HTTP::Server
 
         upstream = TCPSocket.new(host, port)
 
+        channel = Channel(Nil).new
+
         @response.reset
         @response.upgrade do |downstream|
           downstream = downstream.as(TCPSocket)
           downstream.sync = true
 
-          # FIXME broken in Crystal 0.35.0
-          # Reference: https://github.com/crystal-lang/crystal/pull/9243
-          # ?!
-          # https://github.com/crystal-lang/crystal/pull/9243/files#diff-acf23ce080d7cd430f3acb722d4d93b9R515
           spawn do
             spawn do
               IO.copy(upstream, downstream)
+            rescue
+              channel.send(nil)
             end
+
             spawn do
               IO.copy(downstream, upstream)
+              channel.send(nil)
             end
           end
+
+          channel.receive
         end
       else
         uri = URI.parse(@request.resource)

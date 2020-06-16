@@ -5,7 +5,7 @@ authors:
   - Theo Li <bbtfrr@gmail.com>
   - Anton Maminov <anton.maminov@gmail.com>
 
-crystal: 0.30.0
+crystal: ">= 0.35.0"
 
 development_dependencies:
   kemal:

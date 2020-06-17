@@ -4,7 +4,7 @@ require "option_parser"
 host = "127.0.0.1"
 port = 8080
 
-OptionParser.parse! do |opts|
+OptionParser.parse do |opts|
   opts.on("-h HOST", "--host HOST", "define host to run server") do |opt|
     host = opt
   end
@@ -18,7 +18,7 @@ server = HTTP::Proxy::Server.new(host, port, handlers: [
   HTTP::LogHandler.new,
 ])
 
-server.bind_tcp(port)
+server.bind_tcp(host, port)
 
 puts "Listening on http://#{server.host}:#{server.port}"
 server.listen

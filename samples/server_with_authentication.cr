@@ -6,7 +6,7 @@ port = 8080
 username = "user"
 password = "1234"
 
-OptionParser.parse! do |opts|
+OptionParser.parse do |opts|
   opts.on("-h HOST", "--host HOST", "define host to run server") do |opt|
     host = opt
   end
@@ -34,5 +34,5 @@ end
 
 puts "Listening on http://#{host}:#{port}"
 puts "Use #{username}:#{password} for authentication"
-server.bind_tcp(port)
+server.bind_tcp(host, port)
 server.listen

@@ -1,4 +1,5 @@
 require "../src/http_proxy"
+require "option_parser"
 
 host = "127.0.0.1"
 port = 8080

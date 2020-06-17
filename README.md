@@ -28,7 +28,7 @@ port = 8080
 
 server = HTTP::Proxy::Server.new(host, port)
 
-server.bind_tcp(port)
+server.bind_tcp(host, port)
 puts "Listening on http://#{server.host}:#{server.port}"
 server.listen
 ```
@@ -56,7 +56,7 @@ server = HTTP::Proxy::Server.new(host, port, handlers: [
   context.perform
 end
 
-server.bind_tcp(port)
+server.bind_tcp(host, port)
 puts "Listening on http://#{server.host}:#{server.port}"
 server.listen
 ```

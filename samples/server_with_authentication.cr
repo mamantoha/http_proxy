@@ -24,7 +24,7 @@ OptionParser.parse do |opts|
   end
 end
 
-server = HTTP::Proxy::Server.new(host, port, handlers: [
+server = HTTP::Proxy::Server.new(handlers: [
   HTTP::LogHandler.new,
   HTTP::Proxy::Server::BasicAuth.new(username, password),
 ]) do |context|
@@ -32,7 +32,7 @@ server = HTTP::Proxy::Server.new(host, port, handlers: [
   context.perform
 end
 
-puts "Listening on http://#{host}:#{port}"
+address = server.bind_tcp(host, port)
+puts "Listening on http://#{address}"
 puts "Use #{username}:#{password} for authentication"
-server.bind_tcp(host, port)
 server.listen

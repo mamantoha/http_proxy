@@ -14,11 +14,10 @@ OptionParser.parse do |opts|
   end
 end
 
-server = HTTP::Proxy::Server.new(host, port, handlers: [
+server = HTTP::Proxy::Server.new(handlers: [
   HTTP::LogHandler.new,
 ])
 
-server.bind_tcp(host, port)
-
-puts "Listening on http://#{server.host}:#{server.port}"
+address = server.bind_tcp(host, port)
+puts "Listening on http://#{address}"
 server.listen

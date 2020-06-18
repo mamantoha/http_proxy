@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0
+
+* **(breaking-change)** Change `HTTP::Proxy::Server` implementation.
+  `HTTP::Proxy::Server.new` not require `host` and `port` parameters
+
 ## 0.5.0
 
 * Compatibility with Crystal 0.35.0

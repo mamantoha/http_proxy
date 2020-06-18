@@ -17,15 +17,32 @@ describe HTTP::Proxy::Client do
     end
 
     context "HTTP::Client#set_proxy" do
-      it "should make request with proxy" do
+      it "should make HTTP request with proxy" do
         with_proxy_server do |host, port, wants_close|
           proxy_client = HTTP::Proxy::Client.new(host, port)
 
           uri = URI.parse("http://httpbin.org")
           client = HTTP::Client.new(uri)
           client.set_proxy(proxy_client)
-          response = client.get("http://httpbin.org/get")
+          response = client.get("/get")
 
+          (client.proxy?).should eq(true)
+          (response.status_code).should eq(200)
+        ensure
+          wants_close.send(nil)
+        end
+      end
+
+      it "should make HTTPS request with proxy" do
+        with_proxy_server do |host, port, wants_close|
+          proxy_client = HTTP::Proxy::Client.new(host, port)
+
+          uri = URI.parse("https://httpbin.org")
+          client = HTTP::Client.new(uri)
+          client.set_proxy(proxy_client)
+          response = client.get("/get")
+
+          (client.proxy?).should eq(true)
           (response.status_code).should eq(200)
         ensure
           wants_close.send(nil)

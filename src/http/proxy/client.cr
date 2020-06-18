@@ -92,6 +92,8 @@ module HTTP
   end
 
   class Client
+    getter proxy : Bool = false
+
     def set_proxy(proxy : HTTP::Proxy::Client?)
       return unless proxy
 
@@ -108,11 +110,34 @@ module HTTP
         raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")
       end
 
+      @proxy = true
+
       if proxy.username && proxy.password
         proxy_basic_auth(proxy.username, proxy.password)
       end
 
       @socket
+    end
+
+    # True if requests for this connection will be proxied
+    def proxy?
+      @proxy
+    end
+
+    private def new_request(method, path, headers, body : BodyType)
+      # Use full URL instead of path when using HTTP proxy
+      if proxy? && !@tls
+        path = "http://#{host_with_port}#{path}"
+      end
+
+      previous_def
+    end
+
+    private def host_with_port
+      host = @host
+      host = "[#{host}]" if host.includes?(":")
+      default_port = @tls ? URI.default_port("https") : URI.default_port("http")
+      default_port == @port ? host : "#{host}:#{@port}"
     end
 
     # Configures this client to perform proxy basic authentication in every

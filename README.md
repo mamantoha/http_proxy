@@ -75,9 +75,7 @@ end
 
 ### Client
 
-#### Make HTTP request
-
-**Note:** you should send full URL instead of path when using HTTP proxy.
+#### Make request with proxy
 
 ```crystal
 require "http_proxy"
@@ -87,32 +85,18 @@ proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080)
 uri = URI.parse("http://httpbin.org")
 client = HTTP::Client.new(uri)
 client.set_proxy(proxy_client)
-response = client.get("http://httpbin.org/get")
-```
-
-#### Make HTTPS request
-
-```crystal
-require "http_proxy"
-
-proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080)
-
-uri = URI.parse("https://httpbin.org")
-response = HTTP::Client.new(uri) do |client|
-  client.set_proxy(proxy_client)
-  client.get("/get")
-end
+response = client.get("/get")
 ```
 
 #### Client Authentication
 
 ```crystal
-uri = URI.parse("http://httpbin.org")
+uri = URI.parse("https://httpbin.org")
 proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080, username: "user", password: "passwd")
 
 response = HTTP::Client.new(uri) do |client|
   client.set_proxy(proxy_client)
-  client.get("http://httpbin.org/get")
+  client.get("/get")
 end
 
 puts response.status_code

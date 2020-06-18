@@ -3,17 +3,15 @@ require "../src/http_proxy"
 def with_proxy_server(host = "127.0.0.1", port = 8080)
   wants_close = Channel(Nil).new
 
-  server = HTTP::Proxy::Server.new(host, port,
-    [
-      HTTP::LogHandler.new,
-      HTTP::Proxy::Server::BasicAuth.new("user", "passwd"),
-    ]
-  ) do |context|
+  server = HTTP::Proxy::Server.new(handlers: [
+    HTTP::LogHandler.new,
+    HTTP::Proxy::Server::BasicAuth.new("user", "passwd"),
+  ]) do |context|
     context.request.headers.add("X-Forwarded-For", host)
   end
 
   spawn do
-    server.bind_tcp(port)
+    server.bind_tcp(host, port)
     puts "start proxy server"
     server.listen
   end

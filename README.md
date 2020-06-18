@@ -26,10 +26,10 @@ require "http_proxy"
 host = "127.0.0.1"
 port = 8080
 
-server = HTTP::Proxy::Server.new(host, port)
+server = HTTP::Proxy::Server.new
 
-server.bind_tcp(host, port)
-puts "Listening on http://#{server.host}:#{server.port}"
+address = server.bind_tcp(host, port)
+puts "Listening on http://#{address}"
 server.listen
 ```
 
@@ -50,21 +50,21 @@ OptionParser.parse! do |opts|
   end
 end
 
-server = HTTP::Proxy::Server.new(host, port, handlers: [
+server = HTTP::Proxy::Server.new(handlers: [
   HTTP::LogHandler.new,
 ]) do |context|
   context.perform
 end
 
-server.bind_tcp(host, port)
-puts "Listening on http://#{server.host}:#{server.port}"
+address = server.bind_tcp(host, port)
+puts "Listening on http://#{address}"
 server.listen
 ```
 
 #### Basic Authentication
 
 ```crystal
-server = HTTP::Proxy::Server.new("127.0.0.1", 8080, handlers: [
+server = HTTP::Proxy::Server.new(handlers: [
   HTTP::LogHandler.new,
   HTTP::Proxy::Server::BasicAuth.new("user", "passwd"),
 ]) do |context|

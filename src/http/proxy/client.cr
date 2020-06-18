@@ -45,7 +45,7 @@ module HTTP
         socket.sync = true
 
         if tls
-          socket << "CONNECT #{host}:#{port} HTTP/1.0\r\n"
+          socket << "CONNECT #{host}:#{port} HTTP/1.1\r\n"
           socket << "Host: #{host}:#{port}\r\n"
 
           if @username

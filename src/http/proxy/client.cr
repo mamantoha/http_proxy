@@ -130,7 +130,7 @@ module HTTP
         path = "http://#{host_with_port}#{path}"
       end
 
-      previous_def
+      HTTP::Request.new(method, path, headers, body)
     end
 
     private def host_with_port

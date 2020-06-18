@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0
+
+* **(breaking-change)** Sending full URL instead of path when using HTTP proxy is not required
+
 ## 0.6.0
 
 * **(breaking-change)** Change `HTTP::Proxy::Server` implementation.

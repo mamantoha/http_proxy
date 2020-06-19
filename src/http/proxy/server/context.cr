@@ -33,7 +33,7 @@ class HTTP::Proxy::Server < HTTP::Server
     private def transfer(destination, source, channel)
       spawn do
         IO.copy(destination, source)
-      rescue
+      rescue ex
         Log.error(exception: ex) { "Unhandled exception on HTTP::Proxy::Server::Context" }
       ensure
         channel.send(nil)

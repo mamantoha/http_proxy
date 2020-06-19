@@ -1,10 +1,6 @@
 class HTTP::Proxy::Server < HTTP::Server
   class Context < HTTP::Server::Context
     def perform
-      return if @performed
-
-      @performed = true
-
       case @request.method
       when "OPTIONS"
         @response.headers["Allow"] = "OPTIONS,GET,HEAD,POST,PUT,DELETE,CONNECT"

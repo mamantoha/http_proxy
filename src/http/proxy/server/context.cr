@@ -34,7 +34,7 @@ class HTTP::Proxy::Server < HTTP::Server
       spawn do
         IO.copy(destination, source)
       rescue
-        # ignore unhandled exception in spawn
+        Log.error(exception: ex) { "Unhandled exception on HTTP::Proxy::Server::Context" }
       ensure
         channel.send(nil)
       end

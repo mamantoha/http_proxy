@@ -8,3 +8,7 @@ script:
   - crystal spec
   - crystal tool format src/ --check
   - bin/ameba
+
+jobs:
+  allow_failures:
+  - crystal: nightly

@@ -12,3 +12,7 @@ script:
 jobs:
   allow_failures:
   - crystal: nightly
+
+jobs:
+  allow_failures:
+  - crystal: nightly

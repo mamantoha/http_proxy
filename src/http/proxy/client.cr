@@ -98,7 +98,7 @@ module HTTP
       return unless proxy
 
       begin
-        @socket = proxy.open(
+        @io = proxy.open(
           host: @host,
           port: @port,
           tls: @tls,
@@ -116,7 +116,7 @@ module HTTP
         proxy_basic_auth(proxy.username, proxy.password)
       end
 
-      @socket
+      @io
     end
 
     # True if requests for this connection will be proxied

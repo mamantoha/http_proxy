@@ -1,6 +1,7 @@
 # HTTP::Proxy
 
 [![Build Status](https://img.shields.io/travis/mamantoha/http_proxy.svg?style=flat)](https://travis-ci.org/mamantoha/http_proxy)
+![Crystal CI](https://github.com/mamantoha/http_proxy/workflows/Crystal%20CI/badge.svg)
 [![GitHub release](https://img.shields.io/github/release/mamantoha/http_proxy.svg)](https://github.com/mamantoha/http_proxy/releases)
 [![License](https://img.shields.io/github/license/mamantoha/http_proxy.svg)](https://github.com/mamantoha/http_proxy/blob/master/LICENSE)
 

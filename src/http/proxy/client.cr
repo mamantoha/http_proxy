@@ -33,7 +33,7 @@ module HTTP
       # Creates a new socket factory that tunnels via the given host and port.
       # The following optional arguments are supported:
       #
-      # * :headers - additional headers, which will be used for tls connections, which is useful to supply a User-Ganet header
+      # * :headers - additional headers, which will be used for tls connections, which is useful to supply a User-Agent header
       # * :username - the user name to use when authenticating to the proxy
       # * :password - the password to use when authenticating
       def initialize(@host, @port, *, headers : HTTP::Headers? = nil, @username = nil, @password = nil)

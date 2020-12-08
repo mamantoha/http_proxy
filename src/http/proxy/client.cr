@@ -54,7 +54,7 @@ module HTTP
             values.each do |value|
               socket << "#{name}: #{value}\r\n"
             end
-          end  
+          end
           socket << "Host: #{host}:#{port}\r\n"
 
           if @username

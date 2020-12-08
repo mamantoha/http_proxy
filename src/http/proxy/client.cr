@@ -16,6 +16,7 @@ module HTTP
       getter port : Int32
       property username : String?
       property password : String?
+      property headers : HTTP::Headers
 
       getter tls : OpenSSL::SSL::Context::Client?
 
@@ -32,9 +33,12 @@ module HTTP
       # Creates a new socket factory that tunnels via the given host and port.
       # The following optional arguments are supported:
       #
+      # * :headers - additional headers, which will be used for tls connections, which is useful to supply a User-Ganet header
       # * :username - the user name to use when authenticating to the proxy
       # * :password - the password to use when authenticating
-      def initialize(@host, @port, *, @username = nil, @password = nil)
+      def initialize(@host, @port, *, headers : HTTP::Headers? = nil, @username = nil, @password = nil)
+        @headers = headers || HTTP::Headers.new
+        @headers["User-Agent"] ||= "Crystal, HTTP::Proxy/#{HTTP::Proxy::VERSION}"
       end
 
       # Returns a new socket connected to the given host and port via the
@@ -46,6 +50,11 @@ module HTTP
 
         if tls
           socket << "CONNECT #{host}:#{port} HTTP/1.1\r\n"
+          @headers.each do |name, values|
+            values.each do |value|
+              socket << "#{name}: #{value}\r\n"
+            end
+          end
           socket << "Host: #{host}:#{port}\r\n"
 
           if @username

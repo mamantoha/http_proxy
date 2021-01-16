@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.3
+
+* Fixed compatibility with Crystal nightly
+
 ## 0.7.2
 
 * Allow to set HTTP headers for proxy client ([#23](https://github.com/mamantoha/http_proxy/pull/23))

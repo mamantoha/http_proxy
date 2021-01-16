@@ -116,8 +116,7 @@ module HTTP
             connect_timeout: @connect_timeout,
             read_timeout: @read_timeout
           )
-
-       {% else %}
+        {% else %}
           @io = proxy.open(
             host: @host,
             port: @port,
@@ -126,8 +125,7 @@ module HTTP
             connect_timeout: @connect_timeout,
             read_timeout: @read_timeout
           )
-
-       {% end %}
+        {% end %}
       rescue ex : IO::Error
         raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")
       end

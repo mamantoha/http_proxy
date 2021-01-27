@@ -107,25 +107,14 @@ module HTTP
       return unless proxy
 
       begin
-        {% if compare_versions(Crystal::VERSION, "0.35.1") <= 0 %}
-          @socket = proxy.open(
-            host: @host,
-            port: @port,
-            tls: @tls,
-            dns_timeout: @dns_timeout,
-            connect_timeout: @connect_timeout,
-            read_timeout: @read_timeout
-          )
-        {% else %}
-          @io = proxy.open(
-            host: @host,
-            port: @port,
-            tls: @tls,
-            dns_timeout: @dns_timeout,
-            connect_timeout: @connect_timeout,
-            read_timeout: @read_timeout
-          )
-        {% end %}
+        @io = proxy.open(
+          host: @host,
+          port: @port,
+          tls: @tls,
+          dns_timeout: @dns_timeout,
+          connect_timeout: @connect_timeout,
+          read_timeout: @read_timeout
+        )
       rescue ex : IO::Error
         raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")
       end

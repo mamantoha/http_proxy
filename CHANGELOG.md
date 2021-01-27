@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0
+
+* Require Crystal >= 0.36.0
+
 ## 0.7.3
 
 * Fixed compatibility with Crystal nightly

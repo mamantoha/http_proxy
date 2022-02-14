@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.8.1
+
+* Small refactoring
 ## 0.8.0
 
 * Require Crystal >= 0.36.0

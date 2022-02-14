@@ -4,7 +4,7 @@ require "option_parser"
 host = "127.0.0.1"
 port = 8080
 
-OptionParser.parse! do |opts|
+OptionParser.parse do |opts|
   opts.on("-h HOST", "--host HOST", "define host") do |opt|
     host = opt
   end
@@ -35,6 +35,6 @@ puts "Make HTTP request"
 uri = URI.parse("http://httpbin.org")
 client = HTTP::Client.new(uri)
 client.set_proxy(proxy_client)
-response = client.get("http://httpbin.org/get")
+response = client.get("/get")
 puts response.status_code
 puts response.body

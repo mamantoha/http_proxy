@@ -32,22 +32,6 @@ module HTTP
       @proxy
     end
 
-    private def new_request(method, path, headers, body : BodyType)
-      # Use full URL instead of path when using HTTP proxy
-      if proxy? && !@tls
-        path = "http://#{host_with_port}#{path}"
-      end
-
-      HTTP::Request.new(method, path, headers, body)
-    end
-
-    private def host_with_port
-      host = @host
-      host = "[#{host}]" if host.includes?(":")
-      default_port = @tls ? URI.default_port("https") : URI.default_port("http")
-      default_port == @port ? host : "#{host}:#{@port}"
-    end
-
     # Configures this client to perform proxy basic authentication in every
     # request.
     private def proxy_basic_auth(username : String?, password : String?)

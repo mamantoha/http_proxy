@@ -38,3 +38,12 @@ client.set_proxy(proxy_client)
 response = client.get("/get")
 puts response.status_code
 puts response.body
+
+puts "Make HTTP request"
+uri = URI.parse("http://httpbin.org")
+client = HTTP::Client.new(uri)
+client.set_proxy(proxy_client)
+request = HTTP::Request.new("GET", "/get")
+response = client.exec(request)
+puts response.status_code
+puts response.body

@@ -41,8 +41,8 @@ class HTTP::Proxy::Server < HTTP::Server
     end
 
     private def handle_http
-      uri = URI.parse(@request.resource)
-      client = HTTP::Client.new(uri)
+      host = @request.hostname || ""
+      client = HTTP::Client.new(host)
 
       @request.headers.delete("Accept-Encoding")
 

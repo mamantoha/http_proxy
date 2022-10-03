@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: shards install --ignore-crystal-version
+        run: shards install
       - name: Check format
         run: crystal tool format --check
   check_ameba:
@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: shards install --ignore-crystal-version
+        run: shards install
       - name: Check ameba
         run: ./bin/ameba
   test_latest:
@@ -34,9 +34,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: shards install --ignore-crystal-version
+        run: shards install
       - name: Run tests
-        run: crystal spec
+        run: crystal spec --error-trace
   test_nightly:
     runs-on: ubuntu-latest
     container:
@@ -44,6 +44,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
-        run: shards install --ignore-crystal-version
+        run: shards install
       - name: Run tests
-        run: crystal spec
+        run: crystal spec --error-trace

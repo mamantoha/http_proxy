@@ -1,5 +1,9 @@
 # Changelog
 
+* Refactor `HTTP::Proxy::Client`
+* Deprecate `HTTP::Client#set_proxy`. Use `HTTP::Client#proxy=` instead.
+* Require Crystal >= 1.0.0
+
 ## 0.9.0
 
 * Fix an issue with `HTTP::Request` ([#25](https://github.com/mamantoha/http_proxy/pull/25))

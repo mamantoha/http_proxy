@@ -16,7 +16,7 @@ describe HTTP::Proxy::Client do
       (client.password).should eq("password")
     end
 
-    describe "HTTP::Client#set_proxy" do
+    describe "HTTP::Client#proxy=" do
       context HTTP::Client do
         it "should make HTTP request with proxy" do
           with_proxy_server do |host, port, wants_close|
@@ -24,7 +24,7 @@ describe HTTP::Proxy::Client do
 
             uri = URI.parse("http://httpbin.org")
             client = HTTP::Client.new(uri)
-            client.set_proxy(proxy_client)
+            client.proxy = proxy_client
             response = client.get("/get")
 
             (client.proxy?).should eq(true)
@@ -40,7 +40,7 @@ describe HTTP::Proxy::Client do
 
             uri = URI.parse("https://httpbin.org")
             client = HTTP::Client.new(uri)
-            client.set_proxy(proxy_client)
+            client.proxy = proxy_client
             response = client.get("/get")
 
             (client.proxy?).should eq(true)
@@ -58,9 +58,29 @@ describe HTTP::Proxy::Client do
 
             uri = URI.parse("http://httpbin.org")
             client = HTTP::Client.new(uri)
-            client.set_proxy(proxy_client)
+            client.proxy = proxy_client
             request = HTTP::Request.new("GET", "/get")
             response = client.exec(request)
+
+            (client.proxy?).should eq(true)
+            (response.status_code).should eq(200)
+          ensure
+            wants_close.send(nil)
+          end
+        end
+      end
+    end
+
+    describe "HTTP::Client#set_proxy" do
+      context HTTP::Client do
+        it "should make HTTP request with proxy" do
+          with_proxy_server do |host, port, wants_close|
+            proxy_client = HTTP::Proxy::Client.new(host, port)
+
+            uri = URI.parse("http://httpbin.org")
+            client = HTTP::Client.new(uri)
+            client.set_proxy(proxy_client)
+            response = client.get("/get")
 
             (client.proxy?).should eq(true)
             (response.status_code).should eq(200)

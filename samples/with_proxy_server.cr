@@ -1,6 +1,6 @@
 require "../src/http_proxy"
 
-def with_proxy_server(host = "127.0.0.1", port = 8080)
+def with_proxy_server(host = "127.0.0.1", port = 8080, &)
   wants_close = Channel(Nil).new
 
   server = HTTP::Proxy::Server.new(handlers: [
@@ -35,7 +35,7 @@ with_proxy_server do |_host, _port, wants_close|
   proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080, username: "user", password: "passwd")
 
   response = HTTP::Client.new(uri) do |client|
-    client.set_proxy(proxy_client)
+    client.proxy = proxy_client
     client.get("http://httpbin.org/get")
   end
 
@@ -47,7 +47,7 @@ with_proxy_server do |_host, _port, wants_close|
   proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080, username: "user", password: "passwd")
 
   response = HTTP::Client.new(uri) do |client|
-    client.set_proxy(proxy_client)
+    client.proxy = proxy_client
     client.get("/get")
   end
 

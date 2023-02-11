@@ -2,13 +2,13 @@ require "http"
 
 module HTTP
   class Client
-    getter proxy : Bool = false
+    getter proxy : HTTP::Proxy::Client? = nil
 
-    def set_proxy(proxy : HTTP::Proxy::Client?)
-      return unless proxy
+    def proxy=(proxy_client : HTTP::Proxy::Client) : Nil
+      @proxy = proxy_client
 
       begin
-        @io = proxy.open(
+        @io = proxy_client.open(
           host: @host,
           port: @port,
           tls: @tls,
@@ -20,16 +20,19 @@ module HTTP
         raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")
       end
 
-      @proxy = true
-
-      if proxy.username && proxy.password
-        proxy_basic_auth(proxy.username, proxy.password)
+      if proxy_client.username && proxy_client.password
+        proxy_basic_auth(proxy_client.username, proxy_client.password)
       end
     end
 
+    @[Deprecated("Use `#proxy=` instead")]
+    def set_proxy(proxy_client : HTTP::Proxy::Client)
+      self.proxy = proxy_client
+    end
+
     # True if requests for this connection will be proxied
-    def proxy?
-      @proxy
+    def proxy? : Bool
+      !!@proxy
     end
 
     # Configures this client to perform proxy basic authentication in every

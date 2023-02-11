@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.10.0
+
 * Refactor `HTTP::Proxy::Client`
 * Deprecate `HTTP::Client#set_proxy`. Use `HTTP::Client#proxy=` instead.
 * Require Crystal >= 1.0.0

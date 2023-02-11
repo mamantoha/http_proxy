@@ -28,12 +28,16 @@ module HTTP
       # Creates a new socket factory that tunnels via the given host and port.
       # The following optional arguments are supported:
       #
-      # * :headers - additional headers, which will be used for tls connections, which is useful to supply a User-Agent header
-      # * :username - the user name to use when authenticating to the proxy
-      # * :password - the password to use when authenticating
-      def initialize(@host, @port, *, headers : HTTP::Headers? = nil, @username = nil, @password = nil)
+      # * `:headers` - additional headers, which will be used for tls connections, which is useful to supply a User-Agent header
+      # * `:username` - the user name to use when authenticating to the proxy
+      # * `:password` - the password to use when authenticating
+      # * `:user_agent` - the User-Agent request header
+      def initialize(@host, @port, *,
+                     headers : HTTP::Headers? = nil,
+                     @username = nil, @password = nil,
+                     user_agent = "Crystal, HTTP::Proxy/#{HTTP::Proxy::VERSION}")
         @headers = headers || HTTP::Headers.new
-        @headers["User-Agent"] ||= "Crystal, HTTP::Proxy/#{HTTP::Proxy::VERSION}"
+        @headers["User-Agent"] ||= user_agent
       end
 
       # Returns a new socket connected to the given host and port via the

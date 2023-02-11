@@ -28,7 +28,7 @@ module HTTP
       # Creates a new socket factory that tunnels via the given host and port.
       # The following optional arguments are supported:
       #
-      # * `:headers` - additional headers, which will be used for tls connections, which is useful to supply a User-Agent header
+      # * `:headers` - additional headers, which will be used for tls
       # * `:username` - the user name to use when authenticating to the proxy
       # * `:password` - the password to use when authenticating
       # * `:user_agent` - the User-Agent request header
@@ -49,11 +49,13 @@ module HTTP
 
         if tls
           socket << "CONNECT #{host}:#{port} HTTP/1.1\r\n"
+
           @headers.each do |name, values|
             values.each do |value|
               socket << "#{name}: #{value}\r\n"
             end
           end
+
           socket << "Host: #{host}:#{port}\r\n"
 
           if @username

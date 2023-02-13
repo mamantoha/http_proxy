@@ -7,9 +7,15 @@ describe HTTP::Proxy do
   end
 end
 
-def with_proxy_server(host = "127.0.0.1", port = 8080, &)
+def with_proxy_server(host = "127.0.0.1", port = 8080, username : String? = nil, password : String? = nil, &)
   wants_close = Channel(Nil).new
-  server = HTTP::Proxy::Server.new
+
+  server =
+    if username && password
+      HTTP::Proxy::Server.new(handlers: [HTTP::Proxy::Server::BasicAuth.new(username, password)])
+    else
+      HTTP::Proxy::Server.new
+    end
 
   spawn do
     server.bind_tcp(host, port)
@@ -23,5 +29,5 @@ def with_proxy_server(host = "127.0.0.1", port = 8080, &)
 
   Fiber.yield
 
-  yield host, port, wants_close
+  yield host, port, username, password, wants_close
 end

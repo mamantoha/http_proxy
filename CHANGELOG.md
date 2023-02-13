@@ -1,5 +1,8 @@
 # Changelog
 
+* Add `HTTP::Proxy::Client#write_timeout` ([#29](https://github.com/mamantoha/http_proxy/pull/29))
+* Add specs for proxy client with auth ([#28](https://github.com/mamantoha/http_proxy/pull/28))
+
 ## 0.10.0
 
 * Refactor `HTTP::Proxy::Client`

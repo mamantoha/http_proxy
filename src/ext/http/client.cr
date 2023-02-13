@@ -14,7 +14,8 @@ module HTTP
           tls: @tls,
           dns_timeout: @dns_timeout,
           connect_timeout: @connect_timeout,
-          read_timeout: @read_timeout
+          read_timeout: @read_timeout,
+          write_timeout: @write_timeout
         )
       rescue ex : IO::Error
         raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")

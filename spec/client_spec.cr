@@ -18,8 +18,8 @@ describe HTTP::Proxy::Client do
 
     describe "HTTP::Client#proxy=" do
       context HTTP::Client do
-        it "should make HTTP request with proxy" do
-          with_proxy_server do |host, port, wants_close|
+        it "should make HTTP request" do
+          with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
             uri = URI.parse("http://httpbin.org")
@@ -34,8 +34,8 @@ describe HTTP::Proxy::Client do
           end
         end
 
-        it "should make HTTPS request with proxy" do
-          with_proxy_server do |host, port, wants_close|
+        it "should make HTTPS request" do
+          with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
             uri = URI.parse("https://httpbin.org")
@@ -49,11 +49,78 @@ describe HTTP::Proxy::Client do
             wants_close.send(nil)
           end
         end
+
+        it "fails if the proxy server is not reachable" do
+          with_proxy_server do |host, _port, _username, _password, wants_close|
+            proxy_client = HTTP::Proxy::Client.new(host, 8081)
+
+            uri = URI.parse("https://httpbin.org")
+            client = HTTP::Client.new(uri)
+
+            expect_raises IO::Error, "Failed to open TCP connection to httpbin.org:443 (Error connecting to '127.0.0.1:8081': Connection refused)" do
+              client.proxy = proxy_client
+            end
+          ensure
+            wants_close.send(nil)
+          end
+        end
+
+        context "with authentication" do
+          it "should make HTTP request" do
+            with_proxy_server(username: "user", password: "passwd") do |host, port, username, password, wants_close|
+              proxy_client = HTTP::Proxy::Client.new(host, port, username: username, password: password)
+
+              uri = URI.parse("http://httpbin.org")
+              client = HTTP::Client.new(uri)
+              client.proxy = proxy_client
+              response = client.get("/get")
+
+              (client.proxy?).should eq(true)
+              (response.status_code).should eq(200)
+            ensure
+              wants_close.send(nil)
+            end
+          end
+
+          it "should make HTTPS request" do
+            with_proxy_server(username: "user", password: "passwd") do |host, port, username, password, wants_close|
+              proxy_client = HTTP::Proxy::Client.new(host, port, username: username, password: password)
+
+              uri = URI.parse("https://httpbin.org")
+              client = HTTP::Client.new(uri)
+              client.proxy = proxy_client
+              response = client.get("/get")
+
+              (client.proxy?).should eq(true)
+              (response.status_code).should eq(200)
+            ensure
+              wants_close.send(nil)
+            end
+          end
+
+          it "should not be success without credentials" do
+            with_proxy_server(username: "user", password: "passwd") do |host, port, _username, _password, wants_close|
+              proxy_client = HTTP::Proxy::Client.new(host, port, username: "invalid", password: "invalid")
+
+              uri = URI.parse("http://httpbin.org")
+              client = HTTP::Client.new(uri)
+              client.proxy = proxy_client
+              response = client.get("/get")
+
+              (client.proxy?).should eq(true)
+              (response.status_code).should eq(407) # 407 Proxy Authentication Required
+
+
+            ensure
+              wants_close.send(nil)
+            end
+          end
+        end
       end
 
       context HTTP::Request do
         it "should make HTTP::Request request with proxy" do
-          with_proxy_server do |host, port, wants_close|
+          with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
             uri = URI.parse("http://httpbin.org")
@@ -74,7 +141,7 @@ describe HTTP::Proxy::Client do
     describe "HTTP::Client#set_proxy" do
       context HTTP::Client do
         it "should make HTTP request with proxy" do
-          with_proxy_server do |host, port, wants_close|
+          with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
             uri = URI.parse("http://httpbin.org")

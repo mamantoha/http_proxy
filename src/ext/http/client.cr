@@ -37,7 +37,7 @@ module HTTP
 
     # Configures this client to perform proxy basic authentication in every
     # request.
-    private def proxy_basic_auth(username : String?, password : String?)
+    private def proxy_basic_auth(username : String?, password : String?) : Nil
       header = "Basic #{Base64.strict_encode("#{username}:#{password}")}"
       before_request do |request|
         request.headers["Proxy-Authorization"] = header

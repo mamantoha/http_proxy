@@ -31,19 +31,19 @@ with_proxy_server do |_host, _port, _username, _password, wants_close|
   puts "start proxy client"
 
   puts "HTTP Request:"
-  uri = URI.parse("http://httpbin.org")
+  uri = URI.parse("http://httpbingo.org")
   proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080, username: "user", password: "passwd")
 
   response = HTTP::Client.new(uri) do |client|
     client.proxy = proxy_client
-    client.get("http://httpbin.org/get")
+    client.get("http://httpbingo.org/get")
   end
 
   puts response.status_code
   puts response.body
 
   puts "HTTPS Request:"
-  uri = URI.parse("https://httpbin.org")
+  uri = URI.parse("https://httpbingo.org")
   proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080, username: "user", password: "passwd")
 
   response = HTTP::Client.new(uri) do |client|

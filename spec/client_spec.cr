@@ -22,7 +22,7 @@ describe HTTP::Proxy::Client do
           with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
-            uri = URI.parse("http://httpbin.org")
+            uri = URI.parse("http://httpbingo.org")
             client = HTTP::Client.new(uri)
             client.proxy = proxy_client
             response = client.get("/get")
@@ -38,7 +38,7 @@ describe HTTP::Proxy::Client do
           with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
-            uri = URI.parse("https://httpbin.org")
+            uri = URI.parse("http://httpbingo.org")
             client = HTTP::Client.new(uri)
             client.proxy = proxy_client
             response = client.get("/get")
@@ -54,10 +54,10 @@ describe HTTP::Proxy::Client do
           with_proxy_server do |host, _port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, 8081)
 
-            uri = URI.parse("https://httpbin.org")
+            uri = URI.parse("https://httpbingo.org")
             client = HTTP::Client.new(uri)
 
-            expect_raises IO::Error, "Failed to open TCP connection to httpbin.org:443 (Error connecting to '127.0.0.1:8081': Connection refused)" do
+            expect_raises IO::Error, "Failed to open TCP connection to httpbingo.org:443 (Error connecting to '127.0.0.1:8081': Connection refused)" do
               client.proxy = proxy_client
             end
           ensure
@@ -70,7 +70,7 @@ describe HTTP::Proxy::Client do
             with_proxy_server(username: "user", password: "passwd") do |host, port, username, password, wants_close|
               proxy_client = HTTP::Proxy::Client.new(host, port, username: username, password: password)
 
-              uri = URI.parse("http://httpbin.org")
+              uri = URI.parse("https://httpbingo.org")
               client = HTTP::Client.new(uri)
               client.proxy = proxy_client
               response = client.get("/get")
@@ -86,7 +86,7 @@ describe HTTP::Proxy::Client do
             with_proxy_server(username: "user", password: "passwd") do |host, port, username, password, wants_close|
               proxy_client = HTTP::Proxy::Client.new(host, port, username: username, password: password)
 
-              uri = URI.parse("https://httpbin.org")
+              uri = URI.parse("https://httpbingo.org")
               client = HTTP::Client.new(uri)
               client.proxy = proxy_client
               response = client.get("/get")
@@ -102,7 +102,7 @@ describe HTTP::Proxy::Client do
             with_proxy_server(username: "user", password: "passwd") do |host, port, _username, _password, wants_close|
               proxy_client = HTTP::Proxy::Client.new(host, port, username: "invalid", password: "invalid")
 
-              uri = URI.parse("http://httpbin.org")
+              uri = URI.parse("http://httpbingo.org")
               client = HTTP::Client.new(uri)
               client.proxy = proxy_client
               response = client.get("/get")
@@ -123,7 +123,7 @@ describe HTTP::Proxy::Client do
           with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
-            uri = URI.parse("http://httpbin.org")
+            uri = URI.parse("http://httpbingo.org")
             client = HTTP::Client.new(uri)
             client.proxy = proxy_client
             request = HTTP::Request.new("GET", "/get")
@@ -144,7 +144,7 @@ describe HTTP::Proxy::Client do
           with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
-            uri = URI.parse("http://httpbin.org")
+            uri = URI.parse("http://httpbingo.org")
             client = HTTP::Client.new(uri)
             client.set_proxy(proxy_client)
             response = client.get("/get")

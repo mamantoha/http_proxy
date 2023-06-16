@@ -82,7 +82,7 @@ require "http_proxy"
 
 proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080)
 
-uri = URI.parse("http://httpbin.org")
+uri = URI.parse("http://httpbingo.org")
 client = HTTP::Client.new(uri)
 client.proxy = proxy_client
 response = client.get("/get")
@@ -91,7 +91,7 @@ response = client.get("/get")
 #### Client Authentication
 
 ```crystal
-uri = URI.parse("https://httpbin.org")
+uri = URI.parse("https://httpbingo.org")
 proxy_client = HTTP::Proxy::Client.new("127.0.0.1", 8080, username: "user", password: "passwd")
 
 response = HTTP::Client.new(uri) do |client|

@@ -38,7 +38,7 @@ describe HTTP::Proxy::Client do
           with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
-            uri = URI.parse("http://httpbingo.org")
+            uri = URI.parse("https://httpbingo.org")
             client = HTTP::Client.new(uri)
             client.proxy = proxy_client
             response = client.get("/get")
@@ -105,7 +105,7 @@ describe HTTP::Proxy::Client do
               uri = URI.parse("http://httpbingo.org")
               client = HTTP::Client.new(uri)
               client.proxy = proxy_client
-              response = client.get("/get")
+              response = client.get("/invalid")
 
               (client.proxy?).should eq(true)
               (response.status_code).should eq(407) # 407 Proxy Authentication Required

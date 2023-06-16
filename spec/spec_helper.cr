@@ -1,5 +1,17 @@
 require "spec"
+require "webmock"
 require "../src/http_proxy"
+
+WebMock.stub(:get, "http://httpbingo.org/get")
+  .with(headers: {"Host" => "httpbingo.org"})
+  .to_return(status: 200, body: "")
+
+WebMock.stub(:get, "https://httpbingo.org/get")
+  .with(headers: {"Host" => "httpbingo.org"})
+  .to_return(status: 200, body: "")
+
+WebMock.stub(:get, "http://httpbingo.org/invalid")
+  .to_return(status: 407, body: "")
 
 describe HTTP::Proxy do
   it "should have version" do

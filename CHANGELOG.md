@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.10.2
+
+* Support Crystal >= 1.12.0 ([#32](https://github.com/mamantoha/http_proxy/pull/32))
+
 ## 0.10.1
 
 * Add `HTTP::Proxy::Client#write_timeout` ([#29](https://github.com/mamantoha/http_proxy/pull/29))

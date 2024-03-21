@@ -21,10 +21,10 @@ module HTTP
 
       getter tls : OpenSSL::SSL::Context::Client?
 
-      @dns_timeout : Float64?
-      @connect_timeout : Float64?
-      @read_timeout : Float64?
-      @write_timeout : Float64?
+      @dns_timeout : Time::Span?
+      @connect_timeout : Time::Span?
+      @read_timeout : Time::Span?
+      @write_timeout : Time::Span?
 
       # Creates a new socket factory that tunnels via the given host and port.
       # The following optional arguments are supported:

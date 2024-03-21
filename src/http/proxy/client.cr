@@ -21,7 +21,7 @@ module HTTP
 
       getter tls : OpenSSL::SSL::Context::Client?
 
-      {% if compare_versions(Crystal::VERSION, "1.12.0") > 0 %}
+      {% if compare_versions(Crystal::VERSION, "1.12.0-dev") < 0 %}
         @dns_timeout : Float64?
         @connect_timeout : Float64?
         @read_timeout : Float64?

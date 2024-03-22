@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.3
+
+* remove `*_timeout` ivars from `HTTP::Proxy::Client` ([#33](https://github.com/mamantoha/http_proxy/pull/33))
+
+
 ## 0.10.2
 
 * Support Crystal >= 1.12.0 ([#32](https://github.com/mamantoha/http_proxy/pull/32))

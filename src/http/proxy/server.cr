@@ -130,6 +130,24 @@ class HTTP::Proxy::Server
     @sockets.size.times { done.receive }
   end
 
+  # Gracefully terminates the server. It will process currently accepted
+  # requests, but it won't accept new connections.
+  def close : Nil
+    raise "Can't close server, it's already closed" if closed?
+
+    @closed = true
+    @processor.close
+
+    @sockets.each do |socket|
+      socket.close
+    rescue
+      # ignore exception on close
+    end
+
+    @listening = false
+    @sockets.clear
+  end
+
   private def handle_client(io : IO)
     if io.is_a?(IO::Buffered)
       io.sync = false

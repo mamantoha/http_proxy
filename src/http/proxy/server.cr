@@ -32,13 +32,13 @@ class HTTP::Proxy::Server
     @processor = HTTP::Server::RequestProcessor.new(handler)
   end
 
-  def initialize(handlers : Array(HTTP::Handler), &handler : Context ->)
+  def initialize(handlers : Indexable(HTTP::Handler), &handler : Context ->)
     handler = build_middleware(handlers, handler)
 
     @processor = HTTP::Server::RequestProcessor.new(handler)
   end
 
-  def initialize(handlers : Array(HTTP::Handler))
+  def initialize(handlers : Indexable(HTTP::Handler))
     handler = build_middleware(handlers)
 
     @processor = HTTP::Server::RequestProcessor.new(handler)

@@ -5,7 +5,7 @@ def with_proxy_server(host = "127.0.0.1", port = 8080, username = "user", passwo
 
   server = HTTP::Proxy::Server.new(handlers: [
     HTTP::LogHandler.new,
-    HTTP::Proxy::Server::BasicAuth.new(username, password),
+    HTTP::Proxy::Server::BasicAuthHandler.new(username, password),
   ]) do |context|
     context.request.headers.add("X-Forwarded-For", host)
   end

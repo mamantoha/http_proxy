@@ -7,9 +7,9 @@ describe HTTP::Proxy::Server do
       server.should be_a(HTTP::Proxy::Server)
     end
 
-    it "with BasicAuth handler" do
+    it "with BasicAuthHandler handler" do
       server = HTTP::Proxy::Server.new([
-        HTTP::Proxy::Server::BasicAuth.new("user", "passwd"),
+        HTTP::Proxy::Server::BasicAuthHandler.new("user", "passwd"),
       ])
       server.should be_a(HTTP::Proxy::Server)
     end

@@ -26,7 +26,7 @@ end
 
 server = HTTP::Proxy::Server.new(handlers: [
   HTTP::LogHandler.new,
-  HTTP::Proxy::Server::BasicAuth.new(username, password),
+  HTTP::Proxy::Server::BasicAuthHandler.new(username, password),
 ]) do |context|
   context.request.headers.add("X-Forwarded-For", host)
   context.perform

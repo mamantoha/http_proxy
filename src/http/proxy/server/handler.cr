@@ -11,3 +11,5 @@ class HTTP::Proxy::Server::Handler
 
   alias HandlerProc = HTTP::Proxy::Server::Context ->
 end
+
+require "./handlers/*"

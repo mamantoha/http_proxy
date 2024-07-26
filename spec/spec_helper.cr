@@ -24,7 +24,7 @@ def with_proxy_server(host = "127.0.0.1", port = 8080, username : String? = nil,
 
   server =
     if username && password
-      HTTP::Proxy::Server.new(handlers: [HTTP::Proxy::Server::BasicAuth.new(username, password)])
+      HTTP::Proxy::Server.new(handlers: [HTTP::Proxy::Server::BasicAuthHandler.new(username, password)])
     else
       HTTP::Proxy::Server.new
     end

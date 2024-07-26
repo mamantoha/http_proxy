@@ -1,5 +1,9 @@
+require "socket"
 require "./server/handler"
-require "./server/basic_auth"
+require "./server/context"
+{% if !flag?(:without_openssl) %}
+  require "openssl"
+{% end %}
 
 # A concurrent Proxy server implementation.
 #

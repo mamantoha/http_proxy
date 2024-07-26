@@ -1,5 +1,5 @@
 class HTTP::Proxy::Server
-  class BasicAuth
+  class BasicAuthHandler
     include HTTP::Handler
 
     def initialize(@username : String, @password : String)

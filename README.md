@@ -66,7 +66,7 @@ server.listen
 ```crystal
 server = HTTP::Proxy::Server.new(handlers: [
   HTTP::LogHandler.new,
-  HTTP::Proxy::Server::BasicAuth.new("user", "passwd"),
+  HTTP::Proxy::Server::BasicAuthHandler.new("user", "passwd"),
 ]) do |context|
   context.request.headers.add("X-Forwarded-For", "127.0.0.1")
   context.perform

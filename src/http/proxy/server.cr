@@ -23,21 +23,27 @@ class HTTP::Proxy::Server
   # Returns `true` if this server is listening on its sockets.
   getter? listening : Bool = false
 
+  # Creates a new HTTP Proxy server
   def initialize
     handler = build_middleware
+
     @processor = HTTP::Server::RequestProcessor.new(handler)
   end
 
+  # Creates a new HTTP Proxy server with the given block as handler.
   def initialize(&handler : Context ->)
     @processor = HTTP::Server::RequestProcessor.new(handler)
   end
 
+  # Creates a new HTTP Proxy server with a handler chain constructed from the *handlers*
+  # array and the given block.
   def initialize(handlers : Indexable(HTTP::Handler), &handler : Context ->)
     handler = build_middleware(handlers, handler)
 
     @processor = HTTP::Server::RequestProcessor.new(handler)
   end
 
+  # Creates a new HTTP Proxy server with the *handlers* array as handler chain.
   def initialize(handlers : Indexable(HTTP::Handler))
     handler = build_middleware(handlers)
 

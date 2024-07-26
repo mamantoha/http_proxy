@@ -1,5 +1,15 @@
-class HTTP::Proxy::Server < HTTP::Server
-  class Context < HTTP::Server::Context
+class HTTP::Proxy::Server
+  class Context
+    # The `HTTP::Request` to process.
+    getter request : HTTP::Request
+
+    # The `HTTP::Server::Response` to configure and write to.
+    getter response : HTTP::Server::Response
+
+    # :nodoc:
+    def initialize(@request : HTTP::Request, @response : HTTP::Server::Response)
+    end
+
     def perform
       case @request.method
       when "OPTIONS"

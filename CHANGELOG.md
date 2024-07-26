@@ -1,5 +1,7 @@
 # Changelog
 
+* **(breaking-change)** Rename `HTTP::Proxy::Server::BasicAuth` to `HTTP::Proxy::Server::BasicAuthHandler` ([#37](https://github.com/mamantoha/http_proxy/pull/37))
+
 ## 0.11.0
 
 * Make `HTTP::Proxy::Server` independent ([#35](https://github.com/mamantoha/http_proxy/pull/35))

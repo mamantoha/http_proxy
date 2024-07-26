@@ -1,9 +1,13 @@
 # Changelog
 
+## 0.11.0
+
+* Make `HTTP::Proxy::Server` independent ([#35](https://github.com/mamantoha/http_proxy/pull/35))
+* Remove deprecated method `HTTP::Proxy::Client#set_proxy` ([#35](https://github.com/mamantoha/http_proxy/pull/35))
+
 ## 0.10.3
 
 * remove `*_timeout` ivars from `HTTP::Proxy::Client` ([#33](https://github.com/mamantoha/http_proxy/pull/33))
-
 
 ## 0.10.2
 

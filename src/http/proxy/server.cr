@@ -34,14 +34,17 @@ class HTTP::Proxy::Server
 
   def initialize(handlers : Array(HTTP::Handler), &handler : Context ->)
     handler = build_middleware(handlers, handler)
+
     @processor = HTTP::Server::RequestProcessor.new(handler)
   end
 
   def initialize(handlers : Array(HTTP::Handler))
     handler = build_middleware(handlers)
+
     @processor = HTTP::Server::RequestProcessor.new(handler)
   end
 
+  # Creates a new HTTP server with the given *handler*.
   def initialize(handler : HTTP::Handler | HTTP::Handler::HandlerProc)
     @processor = HTTP::Server::RequestProcessor.new(handler)
   end

@@ -3,15 +3,11 @@ require "./context"
 class HTTP::Proxy::Server::Handler
   include HTTP::Handler
 
-  property next : HTTP::Handler | Proc | Nil
-
-  alias Proc = Context ->
+  property next : HTTP::Handler | HandlerProc | Nil
 
   def call(context)
-    request = context.request
-    response = context.response
-    context = Context.new(request, response)
-
-    context.perform
+    HTTP::Proxy::Server::Context.new(context.request, context.response).perform
   end
+
+  alias HandlerProc = HTTP::Proxy::Server::Context ->
 end

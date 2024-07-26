@@ -70,6 +70,11 @@ class HTTP::Proxy::Server
     handlers.first
   end
 
+  # Creates a `TCPServer` listening on `host:port` and adds it as a socket, returning the local address
+  # and port the server listens on.
+  #
+  # If *reuse_port* is `true`, it enables the `SO_REUSEPORT` socket option,
+  # which allows multiple processes to bind to the same port.
   def bind_tcp(host : String, port : Int32, reuse_port : Bool = false) : Socket::IPAddress
     tcp_server = TCPServer.new(host, port, reuse_port: reuse_port)
 

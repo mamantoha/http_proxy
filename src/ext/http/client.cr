@@ -26,11 +26,6 @@ module HTTP
       end
     end
 
-    @[Deprecated("Use `#proxy=` instead")]
-    def set_proxy(proxy_client : HTTP::Proxy::Client)
-      self.proxy = proxy_client
-    end
-
     # True if requests for this connection will be proxied
     def proxy? : Bool
       !!@proxy

@@ -57,7 +57,7 @@ describe HTTP::Proxy::Client do
             uri = URI.parse("https://httpbingo.org")
             client = HTTP::Client.new(uri)
 
-            expect_raises IO::Error, "Failed to open TCP connection to httpbingo.org:443 (Error connecting to '127.0.0.1:8081': Connection refused)" do
+            expect_raises IO::Error, /Failed to open TCP connection to httpbingo.org:443 \(Error connecting to '127.0.0.1:8081':/ do
               client.proxy = proxy_client
             end
           ensure

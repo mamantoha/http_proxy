@@ -7,6 +7,7 @@
 ## 0.12.0
 
 * **(breaking-change)** Rename `HTTP::Proxy::Server::BasicAuth` to `HTTP::Proxy::Server::BasicAuthHandler` ([#37](https://github.com/mamantoha/http_proxy/pull/37))
+* Add Windows to CI ([#36](https://github.com/mamantoha/http_proxy/pull/36))
 
 ## 0.11.0
 

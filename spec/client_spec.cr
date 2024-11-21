@@ -34,7 +34,7 @@ describe HTTP::Proxy::Client do
           end
         end
 
-        it "should make HTTPS request" do
+        it "should make HTTPS request", tags: "network" do
           with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)
 
@@ -54,10 +54,10 @@ describe HTTP::Proxy::Client do
           with_proxy_server do |host, _port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, 8081)
 
-            uri = URI.parse("https://httpbingo.org")
+            uri = URI.parse("http://httpbingo.org")
             client = HTTP::Client.new(uri)
 
-            expect_raises IO::Error, /Failed to open TCP connection to httpbingo.org:443 \(Error connecting to '127.0.0.1:8081':/ do
+            expect_raises IO::Error, /Failed to open TCP connection to httpbingo.org:80 \(Error connecting to '127.0.0.1:8081':/ do
               client.proxy = proxy_client
             end
           ensure
@@ -70,7 +70,7 @@ describe HTTP::Proxy::Client do
             with_proxy_server(username: "user", password: "passwd") do |host, port, username, password, wants_close|
               proxy_client = HTTP::Proxy::Client.new(host, port, username: username, password: password)
 
-              uri = URI.parse("https://httpbingo.org")
+              uri = URI.parse("http://httpbingo.org")
               client = HTTP::Client.new(uri)
               client.proxy = proxy_client
               response = client.get("/get")
@@ -82,7 +82,7 @@ describe HTTP::Proxy::Client do
             end
           end
 
-          it "should make HTTPS request" do
+          it "should make HTTPS request", tags: "network" do
             with_proxy_server(username: "user", password: "passwd") do |host, port, username, password, wants_close|
               proxy_client = HTTP::Proxy::Client.new(host, port, username: username, password: password)
 

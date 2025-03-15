@@ -2,7 +2,7 @@ require "../src/http_proxy"
 require "option_parser"
 
 host = "127.0.0.1"
-port = 8080
+port = 8081
 
 OptionParser.parse do |opts|
   opts.on("-h HOST", "--host HOST", "define host to run server") do |opt|

@@ -26,28 +26,20 @@ class HTTP::Proxy::Server
       upstream = TCPSocket.new(host, port)
 
       @response.upgrade do |downstream|
-        channel = Channel(Nil).new(2)
-
         downstream = downstream.as(TCPSocket)
         downstream.sync = true
 
-        spawn do
-          transfer(upstream, downstream, channel)
-          transfer(downstream, upstream, channel)
+        WaitGroup.wait do |wg|
+          wg.spawn { transfer(upstream, downstream) }
+          wg.spawn { transfer(downstream, upstream) }
         end
-
-        2.times { channel.receive }
       end
     end
 
-    private def transfer(destination, source, channel)
-      spawn do
-        IO.copy(destination, source)
-      rescue ex
-        Log.error(exception: ex) { "Unhandled exception on HTTP::Proxy::Server::Context" }
-      ensure
-        channel.send(nil)
-      end
+    private def transfer(destination, source)
+      IO.copy(destination, source)
+    rescue ex
+      Log.error(exception: ex) { "Unhandled exception on HTTP::Proxy::Server::Context" }
     end
 
     private def handle_http

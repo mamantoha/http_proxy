@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.13.0
+
+* **(breaking-change)** Require Crystal >= 1.14.0
+* Use `WaitGroup` instead of a `Channel(Nil)` in server implementation ([39](https://github.com/mamantoha/http_proxy/pull/39))
+
 ## 0.12.1
 
 * Add the tag "network" to specs that require real network access ([92ec7c7](https://github.com/mamantoha/http_proxy/commit/92ec7c77c0aa334cb798b69be4c64958ac0e02a5))

@@ -1,4 +1,5 @@
 require "socket"
+require "wait_group"
 require "./server/handler"
 require "./server/context"
 {% if !flag?(:without_openssl) %}

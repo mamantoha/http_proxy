@@ -114,30 +114,27 @@ class HTTP::Proxy::Server
     raise "Can't start running server" if listening?
 
     @listening = true
-    done = Channel(Nil).new
 
-    @sockets.each do |socket|
-      spawn do
-        loop do
-          io = begin
-            socket.accept?
-          rescue e
-            handle_exception(e)
-            next
-          end
+    WaitGroup.wait do |wg|
+      @sockets.each do |socket|
+        wg.spawn do
+          loop do
+            io = begin
+              socket.accept?
+            rescue e
+              handle_exception(e)
+              next
+            end
 
-          if io
-            dispatch(io)
-          else
-            break
+            if io
+              dispatch(io)
+            else
+              break
+            end
           end
         end
-      ensure
-        done.send nil
       end
     end
-
-    @sockets.size.times { done.receive }
   end
 
   # Gracefully terminates the server. It will process currently accepted

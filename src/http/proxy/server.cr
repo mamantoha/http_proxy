@@ -85,9 +85,9 @@ class HTTP::Proxy::Server
 
     begin
       bind(tcp_server)
-    rescue exc
+    rescue e
       tcp_server.close
-      raise exc
+      raise e
     end
 
     tcp_server.local_address

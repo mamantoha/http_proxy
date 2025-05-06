@@ -3,15 +3,15 @@ require "./spec_helper"
 describe HTTP::Proxy::Client do
   describe "#initialize" do
     it "with host and port" do
-      client = HTTP::Proxy::Client.new("127.0.0.1", 8080)
+      client = HTTP::Proxy::Client.new("127.0.0.1", 9090)
       (client.host).should eq("127.0.0.1")
-      (client.port).should eq(8080)
+      (client.port).should eq(9090)
       (client.username).should be_nil
       (client.password).should be_nil
     end
 
     it "with username and password" do
-      client = HTTP::Proxy::Client.new("127.0.0.1", 8080, username: "user", password: "password")
+      client = HTTP::Proxy::Client.new("127.0.0.1", 9090, username: "user", password: "password")
       (client.username).should eq("user")
       (client.password).should eq("password")
     end

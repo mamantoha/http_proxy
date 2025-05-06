@@ -19,7 +19,7 @@ describe HTTP::Proxy do
   end
 end
 
-def with_proxy_server(host = "127.0.0.1", port = 8080, username : String? = nil, password : String? = nil, &)
+def with_proxy_server(host = "127.0.0.1", port = 9090, username : String? = nil, password : String? = nil, &)
   wants_close = Channel(Nil).new
 
   server =

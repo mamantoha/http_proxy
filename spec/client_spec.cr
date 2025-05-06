@@ -6,8 +6,8 @@ describe HTTP::Proxy::Client do
       client = HTTP::Proxy::Client.new("127.0.0.1", 8080)
       (client.host).should eq("127.0.0.1")
       (client.port).should eq(8080)
-      (client.username).should eq(nil)
-      (client.password).should eq(nil)
+      (client.username).should be_nil
+      (client.password).should be_nil
     end
 
     it "with username and password" do
@@ -27,7 +27,7 @@ describe HTTP::Proxy::Client do
             client.proxy = proxy_client
             response = client.get("/get")
 
-            (client.proxy?).should eq(true)
+            (client.proxy?).should be_true
             (response.status_code).should eq(200)
           ensure
             wants_close.send(nil)
@@ -43,7 +43,7 @@ describe HTTP::Proxy::Client do
             client.proxy = proxy_client
             response = client.get("/get")
 
-            (client.proxy?).should eq(true)
+            (client.proxy?).should be_true
             (response.status_code).should eq(200)
           ensure
             wants_close.send(nil)
@@ -75,7 +75,7 @@ describe HTTP::Proxy::Client do
               client.proxy = proxy_client
               response = client.get("/get")
 
-              (client.proxy?).should eq(true)
+              (client.proxy?).should be_true
               (response.status_code).should eq(200)
             ensure
               wants_close.send(nil)
@@ -91,7 +91,7 @@ describe HTTP::Proxy::Client do
               client.proxy = proxy_client
               response = client.get("/get")
 
-              (client.proxy?).should eq(true)
+              (client.proxy?).should be_true
               (response.status_code).should eq(200)
             ensure
               wants_close.send(nil)
@@ -107,7 +107,7 @@ describe HTTP::Proxy::Client do
               client.proxy = proxy_client
               response = client.get("/invalid")
 
-              (client.proxy?).should eq(true)
+              (client.proxy?).should be_true
               (response.status_code).should eq(407) # 407 Proxy Authentication Required
 
 
@@ -129,7 +129,7 @@ describe HTTP::Proxy::Client do
             request = HTTP::Request.new("GET", "/get")
             response = client.exec(request)
 
-            (client.proxy?).should eq(true)
+            (client.proxy?).should be_true
             (response.status_code).should eq(200)
           ensure
             wants_close.send(nil)

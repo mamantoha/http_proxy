@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.1
+
+* Cosmetic changes
+
 ## 0.13.0
 
 * **(breaking-change)** Require Crystal >= 1.14.0

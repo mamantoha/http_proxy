@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.14.0
+
+* Fix issue with `HTTP::Handler`
+
 ## 0.13.1
 
 * Cosmetic changes

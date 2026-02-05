@@ -3,7 +3,7 @@ require "./context"
 class HTTP::Proxy::Server::Handler
   include HTTP::Handler
 
-  property next : HTTP::Handler | ContextProc | HandlerProc | Nil
+  property next : HTTP::Handler | ContextProc | HandlerProc?
 
   def call(context)
     HTTP::Proxy::Server::Context.new(context.request, context.response).perform

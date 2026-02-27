@@ -73,6 +73,41 @@ server = HTTP::Proxy::Server.new(handlers: [
 end
 ```
 
+#### HTTPS MITM (MVP, CONNECT HTTP/1.1 only)
+
+```crystal
+server = HTTP::Proxy::Server.new
+server.mitm = HTTP::Proxy::Server::MITMConfig.new(
+  certificate_chain_path: "./certs/mitm.crt",
+  private_key_path: "./certs/mitm.key",
+)
+
+address = server.bind_tcp("127.0.0.1", 8080)
+puts "Listening on http://#{address}"
+server.listen
+```
+
+Notes:
+
+- This enables HTTPS interception for `CONNECT` requests.
+- The certificate authority (CA) used to sign MITM certs must be trusted by clients.
+- This MVP is intended for HTTP/1.1 traffic over CONNECT.
+
+Certificate files:
+
+- `mitm-ca.crt` / `mitm-ca.key`: local CA (trust anchor used to sign leaf certs).
+- `mitm.crt` / `mitm.key`: leaf certificate and key presented by the proxy.
+
+Firefox setup:
+
+- Import `mitm-ca.crt` in **Authorities** and trust it for websites.
+- Do **not** import `mitm.crt` into Authorities.
+
+Server setup:
+
+- Pass `mitm.crt` as `certificate_chain_path`.
+- Pass `mitm.key` as `private_key_path`.
+
 ### Client
 
 #### Make request with proxy
@@ -112,7 +147,7 @@ puts response.body
 * [x] HTTPS Proxy: CONNECT support
 * [x] Make context.request & context.response writable
 * [x] Basic Authentication
-* [ ] MITM HTTPS Proxy
+* [x] MITM HTTPS Proxy (MVP, CONNECT HTTP/1.1)
 
 ### Proxy client
 

@@ -1,4 +1,0 @@
-basicConstraints=critical,CA:FALSE
-keyUsage=critical,digitalSignature,keyEncipherment
-extendedKeyUsage=serverAuth
-subjectAltName=DNS:www.linux.org.ru,DNS:linux.org.ru

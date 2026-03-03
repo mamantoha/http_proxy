@@ -116,9 +116,9 @@ class HTTP::Proxy::Server
                 response.consume_body_io
                 body_size = response.body.bytesize
                 debug_puts(mitm, "MITM response ##{request_count}: buffered body bytes=#{body_size}")
-                debug_puts(mitm, "MITM response ##{request_count} body BEGIN")
-                debug_puts(mitm, response.body)
-                debug_puts(mitm, "MITM response ##{request_count} body END")
+                # debug_puts(mitm, "MITM response ##{request_count} body BEGIN")
+                # debug_puts(mitm, response.body)
+                # debug_puts(mitm, "MITM response ##{request_count} body END")
 
                 response.headers.delete("Transfer-Encoding")
                 response.headers["Content-Length"] = body_size.to_s

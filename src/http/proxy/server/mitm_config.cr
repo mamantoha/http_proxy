@@ -1,3 +1,5 @@
+require "./certificate_generator"
+
 class HTTP::Proxy::Server
   class MITMConfig
     getter certificate_chain_path : String?
@@ -25,6 +27,7 @@ class HTTP::Proxy::Server
       @server_context : OpenSSL::SSL::Context::Server?
       @server_context_by_host = {} of String => OpenSSL::SSL::Context::Server
       @mutex = Mutex.new
+      @certificate_generator = CertificateGenerator.new
 
       def server_context : OpenSSL::SSL::Context::Server
         @server_context ||= begin
@@ -89,60 +92,17 @@ class HTTP::Proxy::Server
         ca_key_path = @ca_private_key_path
         raise ArgumentError.new("Dynamic MITM mode requires ca_certificate_path and ca_private_key_path") unless ca_cert_path && ca_key_path
 
-        csr_path : String? = nil
-        ext_path : String? = nil
-
-        csr_path = File.join(@certificate_cache_dir, "#{host_key}.csr")
-        ext_path = File.join(@certificate_cache_dir, "#{host_key}.ext")
         serial_path = File.join(@certificate_cache_dir, "ca.srl")
+        generated = @certificate_generator.generate(
+          host: host,
+          cert_path: cert_path,
+          key_path: key_path,
+          ca_cert_path: ca_cert_path,
+          ca_key_path: ca_key_path,
+          serial_path: serial_path,
+        )
 
-        san = if Socket::IPAddress.valid?(host)
-                "IP:#{host}"
-              else
-                "DNS:#{host}"
-              end
-
-        ext = String.build do |io|
-          io << "basicConstraints=critical,CA:FALSE\n"
-          io << "keyUsage=critical,digitalSignature,keyEncipherment\n"
-          io << "extendedKeyUsage=serverAuth\n"
-          io << "subjectAltName=" << san << '\n'
-        end
-
-        File.write(ext_path, ext)
-
-        run_openssl(["genrsa", "-out", key_path, "2048"])
-        run_openssl(["req", "-new", "-key", key_path, "-out", csr_path, "-subj", "/CN=#{host}"])
-
-        sign_args = [
-          "x509", "-req",
-          "-in", csr_path,
-          "-CA", ca_cert_path,
-          "-CAkey", ca_key_path,
-          "-out", cert_path,
-          "-days", "825",
-          "-sha256",
-          "-extfile", ext_path,
-        ]
-
-        if File.exists?(serial_path)
-          sign_args.concat(["-CAserial", serial_path])
-        else
-          sign_args.concat(["-CAcreateserial", "-CAserial", serial_path])
-        end
-
-        run_openssl(sign_args)
-      ensure
-        File.delete?(csr_path) if csr_path
-        File.delete?(ext_path) if ext_path
-      end
-
-      private def run_openssl(args : Array(String)) : Nil
-        stderr = IO::Memory.new
-        status = Process.run("openssl", args, output: Process::Redirect::Close, error: stderr)
-        return if status.success?
-
-        raise IO::Error.new("OpenSSL command failed: openssl #{args.join(' ')} | #{stderr.to_s.strip}")
+        raise IO::Error.new("Certificate generation failed for #{host}") unless generated
       end
 
       def upstream_context : OpenSSL::SSL::Context::Client?

@@ -57,13 +57,13 @@ class HTTP::Proxy::Server
           downstream.sync = true
 
           tls_downstream = begin
-            OpenSSL::SSL::Socket::Server.new(downstream, context: mitm.server_context, sync_close: true)
+            OpenSSL::SSL::Socket::Server.new(downstream, context: mitm.server_context_for(host), sync_close: true)
           rescue ex : OpenSSL::SSL::Error
-            puts "MITM TLS handshake failed for #{host}:#{port} - #{ex.message}"
+            debug_puts(mitm, "MITM TLS handshake failed for #{host}:#{port} - #{ex.message}")
             next
           end
           tls_downstream.sync = true
-          puts "MITM TLS established for #{host}:#{port}, ALPN=#{tls_downstream.alpn_protocol || "none"}"
+          debug_puts(mitm, "MITM TLS established for #{host}:#{port}, ALPN=#{tls_downstream.alpn_protocol || "none"}")
 
           upstream_tls_context = mitm.upstream_context || OpenSSL::SSL::Context::Client.new
 
@@ -73,33 +73,33 @@ class HTTP::Proxy::Server
 
             loop do
               request_count += 1
-              puts "MITM waiting downstream request ##{request_count} for #{host}:#{port}"
+              debug_puts(mitm, "MITM waiting downstream request ##{request_count} for #{host}:#{port}")
               parsed = HTTP::Request.from_io(tls_downstream)
 
               case parsed
               when Nil
-                puts "MITM downstream EOF for #{host}:#{port}"
+                debug_puts(mitm, "MITM downstream EOF for #{host}:#{port}")
                 break
               when HTTP::Status
-                puts "MITM downstream request parsing failed for #{host}:#{port} (non-HTTP/1.x stream?)"
+                debug_puts(mitm, "MITM downstream request parsing failed for #{host}:#{port} (non-HTTP/1.x stream?)")
                 break
               when HTTP::Request
-                puts "MITM request ##{request_count}: #{parsed.method} #{parsed.resource} #{parsed.version} host=#{parsed.headers["Host"]? || "nil"}"
+                debug_puts(mitm, "MITM request ##{request_count}: #{parsed.method} #{parsed.resource} #{parsed.version} host=#{parsed.headers["Host"]? || "nil"}")
 
                 if parsed.method.in?({"POST", "PUT", "PATCH"})
                   request_body = parsed.body.try(&.gets_to_end) || ""
-                  puts "MITM request ##{request_count} body bytes=#{request_body.bytesize}"
-                  puts "MITM request ##{request_count} body BEGIN"
-                  puts request_body
-                  puts "MITM request ##{request_count} body END"
+                  debug_puts(mitm, "MITM request ##{request_count} body bytes=#{request_body.bytesize}")
+                  debug_puts(mitm, "MITM request ##{request_count} body BEGIN")
+                  debug_puts(mitm, request_body)
+                  debug_puts(mitm, "MITM request ##{request_count} body END")
 
                   content_type = parsed.headers["Content-Type"]?
                   if content_type && content_type.starts_with?("application/x-www-form-urlencoded")
                     begin
                       params = URI::Params.parse(request_body)
-                      puts "MITM request ##{request_count} form params: #{params}"
+                      debug_puts(mitm, "MITM request ##{request_count} form params: #{params}")
                     rescue ex
-                      puts "MITM request ##{request_count} form params parse failed: #{ex.message}"
+                      debug_puts(mitm, "MITM request ##{request_count} form params parse failed: #{ex.message}")
                     end
                   end
 
@@ -111,24 +111,24 @@ class HTTP::Proxy::Server
                 parsed.headers["Accept-Encoding"] = "identity"
 
                 response = upstream_client.exec(parsed)
-                puts "MITM response ##{request_count}: status=#{response.status_code} keep_alive=#{response.keep_alive?} content_length=#{response.headers["Content-Length"]? || "nil"} transfer_encoding=#{response.headers["Transfer-Encoding"]? || "nil"} content_type=#{response.headers["Content-Type"]? || "nil"}"
+                debug_puts(mitm, "MITM response ##{request_count}: status=#{response.status_code} keep_alive=#{response.keep_alive?} content_length=#{response.headers["Content-Length"]? || "nil"} transfer_encoding=#{response.headers["Transfer-Encoding"]? || "nil"} content_type=#{response.headers["Content-Type"]? || "nil"}")
 
                 response.consume_body_io
                 body_size = response.body.bytesize
-                puts "MITM response ##{request_count}: buffered body bytes=#{body_size}"
-                puts "MITM response ##{request_count} body BEGIN"
-                # puts response.body
-                puts "MITM response ##{request_count} body END"
+                debug_puts(mitm, "MITM response ##{request_count}: buffered body bytes=#{body_size}")
+                debug_puts(mitm, "MITM response ##{request_count} body BEGIN")
+                debug_puts(mitm, response.body)
+                debug_puts(mitm, "MITM response ##{request_count} body END")
 
                 response.headers.delete("Transfer-Encoding")
                 response.headers["Content-Length"] = body_size.to_s
 
                 response.to_io(tls_downstream)
                 tls_downstream.flush
-                puts "MITM response ##{request_count} forwarded and flushed"
+                debug_puts(mitm, "MITM response ##{request_count} forwarded and flushed")
 
                 keep_alive = parsed.keep_alive? && response.keep_alive?
-                puts "MITM keep-alive ##{request_count}: request=#{parsed.keep_alive?} response=#{response.keep_alive?} -> #{keep_alive}"
+                debug_puts(mitm, "MITM keep-alive ##{request_count}: request=#{parsed.keep_alive?} response=#{response.keep_alive?} -> #{keep_alive}")
                 break unless keep_alive
               end
             end
@@ -136,6 +136,10 @@ class HTTP::Proxy::Server
         end
       rescue ex
         Log.error(exception: ex) { "Unhandled exception on HTTP::Proxy::Server::Context MITM tunnel" }
+      end
+
+      private def debug_puts(mitm : HTTP::Proxy::Server::MITMConfig, message : String)
+        puts message if mitm.debug
       end
     {% end %}
 

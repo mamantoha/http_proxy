@@ -8,3 +8,4 @@
 /shard.lock
 
 /http_proxy
+/.mitm-certs/

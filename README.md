@@ -78,8 +78,10 @@ end
 ```crystal
 server = HTTP::Proxy::Server.new
 server.mitm = HTTP::Proxy::Server::MITMConfig.new(
-  certificate_chain_path: "./certs/mitm.crt",
-  private_key_path: "./certs/mitm.key",
+  ca_certificate_path: "./certs/mitm-ca.crt",
+  ca_private_key_path: "./certs/mitm-ca.key",
+  certificate_cache_dir: "./.mitm-certs",
+  debug: false,
 )
 
 address = server.bind_tcp("127.0.0.1", 8080)
@@ -95,8 +97,12 @@ Notes:
 
 Certificate files:
 
-- `mitm-ca.crt` / `mitm-ca.key`: local CA (trust anchor used to sign leaf certs).
-- `mitm.crt` / `mitm.key`: leaf certificate and key presented by the proxy.
+- `mitm-ca.crt` / `mitm-ca.key`: local CA (trust anchor used to sign dynamic leaf certs).
+- `./.mitm-certs/*.crt` / `./.mitm-certs/*.key`: generated per-host leaf certificates.
+
+Static mode is still available:
+
+- `mitm.crt` / `mitm.key`: a single leaf certificate and key presented by the proxy.
 
 Firefox setup:
 
@@ -105,8 +111,21 @@ Firefox setup:
 
 Server setup:
 
-- Pass `mitm.crt` as `certificate_chain_path`.
-- Pass `mitm.key` as `private_key_path`.
+- Dynamic mode (recommended): pass `mitm-ca.crt` as `ca_certificate_path` and `mitm-ca.key` as `ca_private_key_path`.
+- Static mode: pass `mitm.crt` as `certificate_chain_path` and `mitm.key` as `private_key_path`.
+
+Run dynamic MITM sample:
+
+```bash
+crystal run samples/server_mitm.cr
+```
+
+Useful flags:
+
+- `--ca-cert ./mitm-ca.crt`
+- `--ca-key ./mitm-ca.key`
+- `--cache-dir ./.mitm-certs`
+- `--debug` (enable verbose MITM request/response output)
 
 ### Client
 

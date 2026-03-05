@@ -47,6 +47,8 @@ class HTTP::Proxy::Server
                  serial_path : String) : Bool
       return false unless generate_private_key(key_path)
 
+      serial = next_serial(serial_path)
+
       host_key = load_private_key(key_path)
       return false if host_key.null?
 
@@ -59,11 +61,10 @@ class HTTP::Proxy::Server
       csr = create_csr(host, host_key)
       return false if csr.null?
 
-      cert, serial = sign_csr(host, csr, ca_cert, ca_key)
+      cert = sign_csr(host, serial, csr, ca_cert, ca_key)
       return false if cert.null?
 
       return false unless write_certificate(cert_path, cert)
-      File.write(serial_path, serial.to_s)
       true
     ensure
       LibCrypto.x509_req_free(csr) if csr && !csr.null?
@@ -126,48 +127,56 @@ class HTTP::Proxy::Server
     # Native equivalent of:
     #   openssl x509 -req -in <csr> -CA <ca_cert> -CAkey <ca_key> \
     #     -days 825 -sha256 -extfile <ext>
-    private def sign_csr(host : String, req : LibCrypto::X509_REQ, ca_cert : LibCrypto::X509, ca_key : LibCrypto::EVP_PKEY) : {LibCrypto::X509, Int64}
+    private def sign_csr(host : String, serial : Int64, req : LibCrypto::X509_REQ, ca_cert : LibCrypto::X509, ca_key : LibCrypto::EVP_PKEY) : LibCrypto::X509
       cert = LibCrypto.x509_new
-      return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if cert.null?
+      return Pointer(Void).null.as(LibCrypto::X509) if cert.null?
 
       req_pubkey = LibCrypto.x509_req_get_pubkey(req)
-      return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if req_pubkey.null?
+      return Pointer(Void).null.as(LibCrypto::X509) if req_pubkey.null?
 
       begin
-        serial = Time.utc.to_unix
-
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if LibCrypto.x509_set_version(cert, 2) != 1
+        return Pointer(Void).null.as(LibCrypto::X509) if LibCrypto.x509_set_version(cert, 2) != 1
         serial_number = LibCrypto.x509_get_serial_number(cert)
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if serial_number.null?
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if LibCrypto.asn1_integer_set(serial_number, serial) != 1
+        return Pointer(Void).null.as(LibCrypto::X509) if serial_number.null?
+        return Pointer(Void).null.as(LibCrypto::X509) if LibCrypto.asn1_integer_set(serial_number, serial) != 1
 
         not_before = LibCrypto.x509_getm_not_before(cert)
         not_after = LibCrypto.x509_getm_not_after(cert)
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if not_before.null? || not_after.null?
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if LibCrypto.x509_gmtime_adj(not_before, 0).null?
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if LibCrypto.x509_gmtime_adj(not_after, 825_i64 * 24 * 60 * 60).null?
+        return Pointer(Void).null.as(LibCrypto::X509) if not_before.null? || not_after.null?
+        return Pointer(Void).null.as(LibCrypto::X509) if LibCrypto.x509_gmtime_adj(not_before, 0).null?
+        return Pointer(Void).null.as(LibCrypto::X509) if LibCrypto.x509_gmtime_adj(not_after, 825_i64 * 24 * 60 * 60).null?
 
         req_subject = LibCrypto.x509_req_get_subject_name(req)
         issuer_subject = LibCrypto.x509_get_subject_name(ca_cert)
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if req_subject.null? || issuer_subject.null?
+        return Pointer(Void).null.as(LibCrypto::X509) if req_subject.null? || issuer_subject.null?
 
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if LibCrypto.x509_set_subject_name(cert, req_subject) != 1
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if LibCrypto.x509_set_issuer_name(cert, issuer_subject) != 1
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if LibCrypto.x509_set_pubkey(cert, req_pubkey) != 1
+        return Pointer(Void).null.as(LibCrypto::X509) if LibCrypto.x509_set_subject_name(cert, req_subject) != 1
+        return Pointer(Void).null.as(LibCrypto::X509) if LibCrypto.x509_set_issuer_name(cert, issuer_subject) != 1
+        return Pointer(Void).null.as(LibCrypto::X509) if LibCrypto.x509_set_pubkey(cert, req_pubkey) != 1
 
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} unless add_extension(cert, "basicConstraints", "critical,CA:FALSE")
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} unless add_extension(cert, "keyUsage", "critical,digitalSignature,keyEncipherment")
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} unless add_extension(cert, "extendedKeyUsage", "serverAuth")
+        return Pointer(Void).null.as(LibCrypto::X509) unless add_extension(cert, "basicConstraints", "critical,CA:FALSE")
+        return Pointer(Void).null.as(LibCrypto::X509) unless add_extension(cert, "keyUsage", "critical,digitalSignature,keyEncipherment")
+        return Pointer(Void).null.as(LibCrypto::X509) unless add_extension(cert, "extendedKeyUsage", "serverAuth")
 
         san_value = Socket::IPAddress.valid?(host) ? "IP:#{host}" : "DNS:#{host}"
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} unless add_extension(cert, "subjectAltName", san_value)
+        return Pointer(Void).null.as(LibCrypto::X509) unless add_extension(cert, "subjectAltName", san_value)
 
-        return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if LibCrypto.x509_sign(cert, ca_key, LibCrypto.evp_sha256) <= 0
+        return Pointer(Void).null.as(LibCrypto::X509) if LibCrypto.x509_sign(cert, ca_key, LibCrypto.evp_sha256) <= 0
 
-        {cert, serial}
+        cert
       ensure
         LibCrypto.evp_pkey_free(req_pubkey)
       end
+    end
+
+    private def next_serial(serial_path : String) : Int64
+      current = if File.exists?(serial_path)
+                  File.read(serial_path).strip.to_i64?
+                end
+      base = current || (Time.utc.to_unix * 1000)
+      serial = base + 1
+      File.write(serial_path, serial.to_s)
+      serial
     end
 
     # Native equivalent of adding extension entries via extfile in `openssl x509 -extfile ...`.

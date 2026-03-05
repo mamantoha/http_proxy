@@ -52,6 +52,12 @@ class HTTP::Proxy::Server
       private def handle_tunneling_mitm(mitm : HTTP::Proxy::Server::MITMConfig)
         host, port = connect_target
 
+        if mitm.bypass_target?(host, port)
+          debug_puts(mitm, "MITM bypass cache hit for #{host}:#{port}")
+          handle_tunneling
+          return
+        end
+
         @response.upgrade do |downstream|
           downstream = downstream.as(TCPSocket)
           downstream.sync = true
@@ -66,9 +72,14 @@ class HTTP::Proxy::Server
           debug_puts(mitm, "MITM TLS established for #{host}:#{port}, ALPN=#{tls_downstream.alpn_protocol || "none"}")
 
           upstream_tls_context = mitm.upstream_context || OpenSSL::SSL::Context::Client.new
+          upstream_tls_context.alpn_protocol = "http/1.1"
+          upstream_tcp = TCPSocket.new(host, port)
+          upstream_tcp.sync = true
+          upstream_tls = OpenSSL::SSL::Socket::Client.new(upstream_tcp, context: upstream_tls_context, sync_close: true, hostname: host.rchop('.'))
+          upstream_tls.sync = true
+          debug_puts(mitm, "MITM upstream TLS established for #{host}:#{port}, ALPN=#{upstream_tls.alpn_protocol || "none"}")
 
-          HTTP::Client.new(host, port, tls: upstream_tls_context) do |upstream_client|
-            upstream_client.compress = false
+          begin
             request_count = 0
 
             loop do
@@ -110,8 +121,30 @@ class HTTP::Proxy::Server
                 parsed.headers.delete("Proxy-Connection")
                 parsed.headers["Accept-Encoding"] = "identity"
 
-                response = upstream_client.exec(parsed)
+                parsed.to_io(upstream_tls)
+                upstream_tls.flush
+
+                response = begin
+                  HTTP::Client::Response.from_io(upstream_tls, ignore_body: parsed.ignore_body?, decompress: false)
+                rescue ex
+                  debug_puts(mitm, "MITM upstream response parse failed for #{host}:#{port} request ##{request_count}: #{ex.class}: #{ex.message}")
+                  mitm.mark_bypass_target(host, port)
+                  debug_puts(mitm, "MITM marked bypass target #{host}:#{port} due to incompatible upstream protocol")
+                  break
+                end
                 debug_puts(mitm, "MITM response ##{request_count}: status=#{response.status_code} keep_alive=#{response.keep_alive?} content_length=#{response.headers["Content-Length"]? || "nil"} transfer_encoding=#{response.headers["Transfer-Encoding"]? || "nil"} content_type=#{response.headers["Content-Type"]? || "nil"}")
+
+                if response.status_code == 101
+                  response.to_io(tls_downstream)
+                  tls_downstream.flush
+                  debug_puts(mitm, "MITM response ##{request_count}: upgrade 101 detected, switching to raw tunnel")
+
+                  WaitGroup.wait do |wg|
+                    wg.spawn { transfer(upstream_tls, tls_downstream) }
+                    wg.spawn { transfer(tls_downstream, upstream_tls) }
+                  end
+                  break
+                end
 
                 response.consume_body_io
                 body_size = response.body.bytesize
@@ -132,6 +165,8 @@ class HTTP::Proxy::Server
                 break unless keep_alive
               end
             end
+          ensure
+            upstream_tls.close
           end
         end
       rescue ex
@@ -157,7 +192,7 @@ class HTTP::Proxy::Server
     end
 
     private def transfer(destination, source)
-      IO.copy(destination, source)
+      IO.copy(source, destination)
     rescue ex
       Log.error(exception: ex) { "Unhandled exception on HTTP::Proxy::Server::Context" }
     end

@@ -1,4 +1,5 @@
 require "./certificate_generator"
+require "set"
 
 class HTTP::Proxy::Server
   class MITMConfig
@@ -26,8 +27,21 @@ class HTTP::Proxy::Server
     {% unless flag?(:without_openssl) %}
       @server_context : OpenSSL::SSL::Context::Server?
       @server_context_by_host = {} of String => OpenSSL::SSL::Context::Server
+      @bypass_targets = Set(String).new
       @mutex = Mutex.new
       @certificate_generator = CertificateGenerator.new
+
+      def bypass_target?(host : String, port : Int32) : Bool
+        @mutex.synchronize do
+          @bypass_targets.includes?("#{host}:#{port}")
+        end
+      end
+
+      def mark_bypass_target(host : String, port : Int32) : Nil
+        @mutex.synchronize do
+          @bypass_targets.add("#{host}:#{port}")
+        end
+      end
 
       def server_context : OpenSSL::SSL::Context::Server
         @server_context ||= begin

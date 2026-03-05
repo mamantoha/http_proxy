@@ -50,6 +50,8 @@ end
 
 class HTTP::Proxy::Server
   class CertificateGenerator
+    # Native equivalent of:
+    #   openssl genrsa -out <path> <bits>
     def generate_private_key(path : String, bits : Int32 = 2048) : Bool
       ctx = LibCrypto.evp_pkey_ctx_new_id(LibCrypto::EVP_PKEY_RSA, Pointer(Void).null)
       return false if ctx.null?
@@ -78,6 +80,11 @@ class HTTP::Proxy::Server
       end
     end
 
+    # Native equivalent of the combined CLI flow:
+    #   openssl genrsa -out <key_path> 2048
+    #   openssl req -new -key <key_path> -out <csr_path> -subj "/CN=<host>"
+    #   openssl x509 -req -in <csr_path> -CA <ca_cert_path> -CAkey <ca_key_path> \
+    #     -out <cert_path> -days 825 -sha256 -extfile <ext_path>
     def generate(*,
                  host : String,
                  cert_path : String,
@@ -113,6 +120,8 @@ class HTTP::Proxy::Server
       LibCrypto.evp_pkey_free(ca_key) if ca_key && !ca_key.null?
     end
 
+    # Native equivalent of:
+    #   openssl pkey -in <path>
     private def load_private_key(path : String) : LibCrypto::EVP_PKEY
       bio = LibCrypto.bio_new_file(path.to_unsafe, "r".to_unsafe)
       return Pointer(Void).null.as(LibCrypto::EVP_PKEY) if bio.null?
@@ -125,6 +134,8 @@ class HTTP::Proxy::Server
       end
     end
 
+    # Native equivalent of:
+    #   openssl x509 -in <path>
     private def load_certificate(path : String) : LibCrypto::X509
       bio = LibCrypto.bio_new_file(path.to_unsafe, "r".to_unsafe)
       return Pointer(Void).null.as(LibCrypto::X509) if bio.null?
@@ -137,6 +148,8 @@ class HTTP::Proxy::Server
       end
     end
 
+    # Native equivalent of:
+    #   openssl req -new -key <host_key> -subj "/CN=<host>"
     private def create_csr(host : String, host_key : LibCrypto::EVP_PKEY) : LibCrypto::X509_REQ
       req = LibCrypto.x509_req_new
       return Pointer(Void).null.as(LibCrypto::X509_REQ) if req.null?
@@ -157,6 +170,9 @@ class HTTP::Proxy::Server
       req
     end
 
+    # Native equivalent of:
+    #   openssl x509 -req -in <csr> -CA <ca_cert> -CAkey <ca_key> \
+    #     -days 825 -sha256 -extfile <ext>
     private def sign_csr(host : String, req : LibCrypto::X509_REQ, ca_cert : LibCrypto::X509, ca_key : LibCrypto::EVP_PKEY) : {LibCrypto::X509, Int64}
       cert = LibCrypto.x509_new
       return {Pointer(Void).null.as(LibCrypto::X509), 0_i64} if cert.null?
@@ -201,6 +217,7 @@ class HTTP::Proxy::Server
       end
     end
 
+    # Native equivalent of adding extension entries via extfile in `openssl x509 -extfile ...`.
     private def add_extension(cert : LibCrypto::X509, name : String, value : String) : Bool
       nid = LibCrypto.obj_sn2nid(name.to_unsafe)
       nid = LibCrypto.obj_ln2nid(name.to_unsafe) if nid == LibCrypto::NID_undef
@@ -216,6 +233,8 @@ class HTTP::Proxy::Server
       end
     end
 
+    # Native equivalent of:
+    #   openssl x509 -out <path>
     private def write_certificate(path : String, cert : LibCrypto::X509) : Bool
       bio = LibCrypto.bio_new_file(path.to_unsafe, "w".to_unsafe)
       return false if bio.null?

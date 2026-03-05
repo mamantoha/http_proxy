@@ -7,8 +7,8 @@ class HTTP::Proxy::Server
     getter ca_certificate_path : String?
     getter ca_private_key_path : String?
     getter certificate_cache_dir : String
-    getter upstream_insecure : Bool
-    getter debug : Bool
+    getter? upstream_insecure : Bool
+    getter? debug : Bool
 
     def initialize(@certificate_chain_path : String, @private_key_path : String, @upstream_insecure : Bool = false, @debug : Bool = false)
       @ca_certificate_path = nil

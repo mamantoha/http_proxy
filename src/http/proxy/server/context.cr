@@ -139,7 +139,7 @@ class HTTP::Proxy::Server
       end
 
       private def debug_puts(mitm : HTTP::Proxy::Server::MITMConfig, message : String)
-        puts message if mitm.debug
+        puts message if mitm.debug?
       end
     {% end %}
 

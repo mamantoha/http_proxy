@@ -97,6 +97,23 @@ class HTTP::Proxy::Server
               when HTTP::Request
                 debug_puts(mitm, "MITM request ##{request_count}: #{parsed.method} #{parsed.resource} #{parsed.version} host=#{parsed.headers["Host"]? || "nil"}")
 
+                if websocket_upgrade_request?(parsed)
+                  parsed.headers.delete("Proxy-Authorization")
+                  parsed.headers.delete("Proxy-Connection")
+
+                  parsed.to_io(upstream_tls)
+                  upstream_tls.flush
+
+                  mitm.mark_bypass_target(host, port)
+                  debug_puts(mitm, "MITM detected websocket upgrade for #{host}:#{port}; bypassing via raw tunnel")
+
+                  WaitGroup.wait do |wg|
+                    wg.spawn { transfer(upstream_tls, tls_downstream) }
+                    wg.spawn { transfer(tls_downstream, upstream_tls) }
+                  end
+                  break
+                end
+
                 if parsed.method.in?({"POST", "PUT", "PATCH"})
                   request_body = parsed.body.try(&.gets_to_end) || ""
                   debug_puts(mitm, "MITM request ##{request_count} body bytes=#{request_body.bytesize}")
@@ -195,6 +212,18 @@ class HTTP::Proxy::Server
       IO.copy(source, destination)
     rescue ex
       Log.error(exception: ex) { "Unhandled exception on HTTP::Proxy::Server::Context" }
+    end
+
+    private def websocket_upgrade_request?(request : HTTP::Request) : Bool
+      upgrade = request.headers["Upgrade"]?
+      return false unless upgrade && upgrade.compare("websocket", case_insensitive: true) == 0
+
+      connection = request.headers["Connection"]?
+      return false unless connection
+
+      connection.split(',').any? do |token|
+        token.strip.compare("upgrade", case_insensitive: true) == 0
+      end
     end
 
     private def handle_http

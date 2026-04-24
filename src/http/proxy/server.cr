@@ -2,6 +2,7 @@ require "socket"
 require "wait_group"
 require "./server/handler"
 require "./server/context"
+require "./server/mitm_config"
 {% if !flag?(:without_openssl) %}
   require "openssl"
 {% end %}
@@ -27,6 +28,8 @@ class HTTP::Proxy::Server
 
   # Returns `true` if this server is listening on its sockets.
   getter? listening : Bool = false
+
+  property mitm : MITMConfig?
 
   # Creates a new HTTP Proxy server
   def initialize
@@ -61,7 +64,7 @@ class HTTP::Proxy::Server
   end
 
   private def build_middleware(handler : (Context ->)? = nil)
-    proxy_handler = Handler.new
+    proxy_handler = Handler.new(-> { @mitm })
     proxy_handler.next = handler if handler
     proxy_handler
   end

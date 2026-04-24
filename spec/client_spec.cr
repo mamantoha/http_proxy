@@ -109,8 +109,6 @@ describe HTTP::Proxy::Client do
 
               (client.proxy?).should be_true
               (response.status_code).should eq(407) # 407 Proxy Authentication Required
-
-
             ensure
               wants_close.send(nil)
             end

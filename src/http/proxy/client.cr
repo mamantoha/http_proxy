@@ -32,10 +32,14 @@ module HTTP
       # * `:username` - the user name to use when authenticating to the proxy
       # * `:password` - the password to use when authenticating
       # * `:user_agent` - the User-Agent request header
-      def initialize(@host, @port, *,
-                     headers : HTTP::Headers? = nil,
-                     @username = nil, @password = nil,
-                     user_agent = "Crystal, HTTP::Proxy/#{HTTP::Proxy::VERSION}")
+      def initialize(
+        @host,
+        @port,
+        *,
+        headers : HTTP::Headers? = nil,
+        @username = nil, @password = nil,
+        user_agent = "Crystal, HTTP::Proxy/#{HTTP::Proxy::VERSION}",
+      )
         @headers = headers || HTTP::Headers.new
         @headers["User-Agent"] ||= user_agent
       end

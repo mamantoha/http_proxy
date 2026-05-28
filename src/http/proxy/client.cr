@@ -19,7 +19,11 @@ module HTTP
       property password : String?
       property headers : HTTP::Headers
 
-      getter tls : OpenSSL::SSL::Context::Client?
+      {% if flag?(:without_openssl) %}
+        getter tls : Nil = nil
+      {% else %}
+        getter tls : OpenSSL::SSL::Context::Client?
+      {% end %}
 
       # Creates a new socket factory that tunnels via the given host and port.
       # The following optional arguments are supported:
@@ -28,10 +32,14 @@ module HTTP
       # * `:username` - the user name to use when authenticating to the proxy
       # * `:password` - the password to use when authenticating
       # * `:user_agent` - the User-Agent request header
-      def initialize(@host, @port, *,
-                     headers : HTTP::Headers? = nil,
-                     @username = nil, @password = nil,
-                     user_agent = "Crystal, HTTP::Proxy/#{HTTP::Proxy::VERSION}")
+      def initialize(
+        @host,
+        @port,
+        *,
+        headers : HTTP::Headers? = nil,
+        @username = nil, @password = nil,
+        user_agent = "Crystal, HTTP::Proxy/#{HTTP::Proxy::VERSION}",
+      )
         @headers = headers || HTTP::Headers.new
         @headers["User-Agent"] ||= user_agent
       end
@@ -55,10 +63,11 @@ module HTTP
 
           socket << "Host: #{host}:#{port}\r\n"
 
-          if @username
-            credentials = Base64.strict_encode("#{@username}:#{@password}")
-            credentials = "#{credentials}\n".gsub(/\s/, "")
-            socket << "Proxy-Authorization: Basic #{credentials}\r\n"
+          if username = @username
+            if password = @password
+              credentials = Base64.strict_encode("#{username}:#{password}")
+              socket << "Proxy-Authorization: Basic #{credentials}\r\n"
+            end
           end
 
           socket << "\r\n"

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.15.0
+
+* Keep proxy configured on `HTTP::Client` reconnect ([#42](https://github.com/mamantoha/http_proxy/pull/42)). Fixes [#40](https://github.com/mamantoha/http_proxy/issues/40)
+
 ## 0.14.0
 
 * Fix issue with `HTTP::Handler`

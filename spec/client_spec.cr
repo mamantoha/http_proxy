@@ -1,5 +1,24 @@
 require "./spec_helper"
 
+class RecordingProxyClient < HTTP::Proxy::Client
+  getter open_calls = 0
+
+  def initialize
+    super("127.0.0.1", 8080)
+  end
+
+  def open(host, port, tls = nil, *, dns_timeout, connect_timeout, read_timeout, write_timeout) : IO
+    @open_calls += 1
+    IO::Memory.new
+  end
+end
+
+class HTTP::Client
+  def proxy_io_for_spec
+    io
+  end
+end
+
 describe HTTP::Proxy::Client do
   describe "#initialize" do
     it "with host and port" do
@@ -18,6 +37,19 @@ describe HTTP::Proxy::Client do
 
     describe "HTTP::Client#proxy=" do
       context HTTP::Client do
+        it "keeps using proxy after client reconnect" do
+          proxy_client = RecordingProxyClient.new
+          client = HTTP::Client.new("httpbingo.org")
+
+          client.proxy = proxy_client
+          proxy_client.open_calls.should eq(1)
+
+          client.close
+
+          client.proxy_io_for_spec
+          proxy_client.open_calls.should eq(2)
+        end
+
         it "should make HTTP request" do
           with_proxy_server do |host, port, _username, _password, wants_close|
             proxy_client = HTTP::Proxy::Client.new(host, port)

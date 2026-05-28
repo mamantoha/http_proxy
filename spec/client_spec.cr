@@ -1,21 +1,36 @@
 require "./spec_helper"
 
+class TrackableIO < IO::Memory
+  getter? closed_flag = false
+
+  def close
+    @closed_flag = true
+  end
+end
+
 class RecordingProxyClient < HTTP::Proxy::Client
   getter open_calls = 0
+  getter opened_ios = [] of TrackableIO
 
-  def initialize
-    super("127.0.0.1", 8080)
+  def initialize(username : String? = nil, password : String? = nil)
+    super("127.0.0.1", 8080, username: username, password: password)
   end
 
   def open(host, port, tls = nil, *, dns_timeout, connect_timeout, read_timeout, write_timeout) : IO
     @open_calls += 1
-    IO::Memory.new
+    io = TrackableIO.new
+    @opened_ios << io
+    io
   end
 end
 
 class HTTP::Client
   def proxy_io_for_spec
     io
+  end
+
+  def apply_proxy_authorization_for_spec(request : HTTP::Request)
+    apply_proxy_authorization(request)
   end
 end
 
@@ -48,6 +63,37 @@ describe HTTP::Proxy::Client do
 
           client.proxy_io_for_spec
           proxy_client.open_calls.should eq(2)
+        end
+
+        it "clears proxy auth header when proxy is reconfigured without credentials" do
+          authenticated_proxy = RecordingProxyClient.new(username: "user", password: "password")
+          unauthenticated_proxy = RecordingProxyClient.new
+          client = HTTP::Client.new("httpbingo.org")
+
+          client.proxy = authenticated_proxy
+
+          request = HTTP::Request.new("GET", "/")
+          client.apply_proxy_authorization_for_spec(request)
+          request.headers["Proxy-Authorization"]?.should_not be_nil
+
+          client.proxy = unauthenticated_proxy
+
+          request = HTTP::Request.new("GET", "/")
+          client.apply_proxy_authorization_for_spec(request)
+          request.headers["Proxy-Authorization"]?.should be_nil
+        end
+
+        it "closes previous connection when reconfiguring proxy" do
+          first_proxy = RecordingProxyClient.new
+          second_proxy = RecordingProxyClient.new
+          client = HTTP::Client.new("httpbingo.org")
+
+          client.proxy = first_proxy
+          first_proxy.opened_ios.last.closed_flag?.should be_false
+
+          client.proxy = second_proxy
+
+          first_proxy.opened_ios.last.closed_flag?.should be_true
         end
 
         it "should make HTTP request" do

@@ -4,7 +4,10 @@ module HTTP
   class Client
     getter proxy : HTTP::Proxy::Client? = nil
 
+    @proxy_basic_auth_header : String? = nil
+
     def proxy=(proxy_client : HTTP::Proxy::Client) : Nil
+      close if @io
       @proxy = proxy_client
 
       begin
@@ -21,8 +24,14 @@ module HTTP
         raise IO::Error.new("Failed to open TCP connection to #{@host}:#{@port} (#{ex.message})")
       end
 
-      if proxy_client.username && proxy_client.password
-        proxy_basic_auth(proxy_client.username, proxy_client.password)
+      if username = proxy_client.username
+        if password = proxy_client.password
+          @proxy_basic_auth_header = "Basic #{Base64.strict_encode("#{username}:#{password}")}"
+        else
+          @proxy_basic_auth_header = nil
+        end
+      else
+        @proxy_basic_auth_header = nil
       end
     end
 
@@ -31,13 +40,15 @@ module HTTP
       !!@proxy
     end
 
-    # Configures this client to perform proxy basic authentication in every
-    # request.
-    private def proxy_basic_auth(username : String?, password : String?) : Nil
-      header = "Basic #{Base64.strict_encode("#{username}:#{password}")}"
-      before_request do |request|
+    private def apply_proxy_authorization(request : HTTP::Request) : Nil
+      if proxy? && (header = @proxy_basic_auth_header)
         request.headers["Proxy-Authorization"] = header
       end
+    end
+
+    def_around_exec do |request|
+      apply_proxy_authorization(request)
+      yield
     end
 
     # Keep proxy behavior across reconnects by rebuilding @io via proxy as well.

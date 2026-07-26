@@ -19,8 +19,9 @@ describe HTTP::Proxy do
   end
 end
 
-def with_proxy_server(host = "127.0.0.1", port = 9090, username : String? = nil, password : String? = nil, &)
+def with_proxy_server(host = "127.0.0.1", port = 0, username : String? = nil, password : String? = nil, &)
   wants_close = Channel(Nil).new
+  started = Channel(Socket::IPAddress | Exception).new(1)
 
   server =
     if username && password
@@ -30,7 +31,15 @@ def with_proxy_server(host = "127.0.0.1", port = 9090, username : String? = nil,
     end
 
   spawn do
-    server.bind_tcp(host, port)
+    address =
+      begin
+        server.bind_tcp(host, port)
+      rescue ex
+        started.send(ex)
+        next
+      end
+
+    started.send(address)
     server.listen
   end
 
@@ -39,7 +48,8 @@ def with_proxy_server(host = "127.0.0.1", port = 9090, username : String? = nil,
     server.close
   end
 
-  Fiber.yield
+  address = started.receive
+  raise address if address.is_a?(Exception)
 
-  yield host, port, username, password, wants_close
+  yield host, address.port, username, password, wants_close
 end

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.16.0
+
+* Fix proxy server CONNECT tunneling with Crystal 1.22 while preserving compatibility with older Crystal versions ([#44](https://github.com/mamantoha/http_proxy/pull/44))
+
+## 0.15.1
+
+* Harden proxy client auth state handling to avoid stale `Proxy-Authorization` headers after proxy reconfiguration ([#43](https://github.com/mamantoha/http_proxy/pull/43))
+* Close previous client connection when reassigning proxy
+* Send CONNECT `Proxy-Authorization` only when both username and password are present
+* Improve `without_openssl` compatibility in proxy client TLS getter typing
+
+## 0.15.0
+
+* Keep proxy configured on `HTTP::Client` reconnect ([#42](https://github.com/mamantoha/http_proxy/pull/42)). Fixes [#40](https://github.com/mamantoha/http_proxy/issues/40)
+
 ## 0.14.0
 
 * Fix issue with `HTTP::Handler`

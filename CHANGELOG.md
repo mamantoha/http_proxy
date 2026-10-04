@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.16.0
 
 * Fix proxy server CONNECT tunneling with Crystal 1.22 while preserving compatibility with older Crystal versions ([#44](https://github.com/mamantoha/http_proxy/pull/44))
 

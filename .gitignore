@@ -8,3 +8,8 @@
 /shard.lock
 
 /http_proxy
+
+# Local MITM certificates/keys generated for manual testing
+/.mitm-certs/
+/mitm-ca.*
+/mitm.*

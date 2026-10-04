@@ -171,7 +171,11 @@ class HTTP::Proxy::Server
       end
     {% end %}
 
-    @processor.process(io, io)
+    {% if compare_versions(Crystal::VERSION, "1.22.0-dev") >= 0 %}
+      @processor.process(io)
+    {% else %}
+      @processor.process(io, io)
+    {% end %}
   ensure
     {% begin %}
       begin

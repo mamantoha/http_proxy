@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Fix proxy server CONNECT tunneling with Crystal 1.22 while preserving compatibility with older Crystal versions ([#44](https://github.com/mamantoha/http_proxy/pull/44))
+
 ## 0.15.1
 
 * Harden proxy client auth state handling to avoid stale `Proxy-Authorization` headers after proxy reconfiguration ([#43](https://github.com/mamantoha/http_proxy/pull/43))

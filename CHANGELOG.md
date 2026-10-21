@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.17.0
 
 * Fix proxy credential leakage to HTTPS origins by sending generated `Proxy-Authorization` headers only during CONNECT, while preserving authentication for plain HTTP proxy requests
 

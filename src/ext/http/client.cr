@@ -41,7 +41,7 @@ module HTTP
     end
 
     private def apply_proxy_authorization(request : HTTP::Request) : Nil
-      if proxy? && (header = @proxy_basic_auth_header)
+      if proxy? && !tls? && (header = @proxy_basic_auth_header)
         request.headers["Proxy-Authorization"] = header
       end
     end

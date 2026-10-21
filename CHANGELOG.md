@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Fix proxy credential leakage to HTTPS origins by sending generated `Proxy-Authorization` headers only during CONNECT, while preserving authentication for plain HTTP proxy requests
+
 ## 0.16.0
 
 * Fix proxy server CONNECT tunneling with Crystal 1.22 while preserving compatibility with older Crystal versions ([#44](https://github.com/mamantoha/http_proxy/pull/44))

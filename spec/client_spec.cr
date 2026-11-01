@@ -214,4 +214,83 @@ describe HTTP::Proxy::Client do
       end
     end
   end
+
+  {% if !flag?(:without_openssl) %}
+    describe "#open" do
+      it "closes underlying TCP socket when CONNECT returns non-success status" do
+        assert_connect_closes_socket("HTTP/1.1 502 Bad Gateway\r\n\r\n", IO::Error)
+      end
+
+      it "closes underlying TCP socket when CONNECT response is invalid" do
+        assert_connect_closes_socket("INVALID_HTTP\r\n\r\n", Exception)
+      end
+
+      it "closes underlying TCP socket when TLS handshake fails" do
+        assert_connect_closes_socket("HTTP/1.1 200 Connection Established\r\n\r\nNOT_TLS\r\n", OpenSSL::SSL::Error)
+      end
+    end
+  {% end %}
 end
+
+{% if !flag?(:without_openssl) %}
+  private def assert_connect_closes_socket(raw_response : String, expected_error : E.class) forall E
+    server = TCPServer.new("127.0.0.1", 0)
+    tls_context = OpenSSL::SSL::Context::Client.new
+    attempt_done = Channel(Nil).new(1)
+    peer_closed = Channel(Bool).new(1)
+    server_done = Channel(Nil).new(1)
+
+    spawn do
+      if peer = server.accept?
+        begin
+          while (line = peer.gets) && !line.empty?
+          end
+          peer << raw_response
+          peer.flush
+          attempt_done.receive
+          peer.read_timeout = 300.milliseconds
+          closed = begin
+            peer.skip_to_end
+            true
+          rescue IO::TimeoutError
+            false
+          rescue IO::Error
+            true
+          end
+          peer_closed.send(closed)
+        ensure
+          peer.close rescue nil
+          server_done.send(nil)
+        end
+      end
+    end
+
+    {% if flag?(:linux) %}
+      baseline_fds = Dir.children("/dev/fd").size
+    {% end %}
+
+    proxy_client = HTTP::Proxy::Client.new("127.0.0.1", server.local_address.port)
+
+    expect_raises(expected_error) do
+      proxy_client.open(
+        "example.com",
+        443,
+        tls: tls_context,
+        dns_timeout: 2.seconds,
+        connect_timeout: 2.seconds,
+        read_timeout: 2.seconds,
+        write_timeout: 2.seconds,
+      )
+    end
+
+    attempt_done.send(nil)
+    peer_closed.receive.should be_true
+    server_done.receive
+
+    {% if flag?(:linux) %}
+      Dir.children("/dev/fd").size.should eq(baseline_fds)
+    {% end %}
+  ensure
+    server.try(&.close)
+  end
+{% end %}

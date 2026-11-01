@@ -48,47 +48,51 @@ module HTTP
       # proxy that was requested when the socket factory was instantiated.
       def open(host, port, tls = nil, *, dns_timeout, connect_timeout, read_timeout, write_timeout) : IO
         socket = TCPSocket.new(@host, @port, dns_timeout, connect_timeout)
-        socket.read_timeout = read_timeout if read_timeout
-        socket.write_timeout = write_timeout if write_timeout
-        socket.sync = false
 
-        if tls
-          socket << "CONNECT #{host}:#{port} HTTP/1.1\r\n"
+        begin
+          socket.read_timeout = read_timeout if read_timeout
+          socket.write_timeout = write_timeout if write_timeout
+          socket.sync = false
 
-          @headers.each do |name, values|
-            values.each do |value|
-              socket << "#{name}: #{value}\r\n"
-            end
-          end
+          if tls
+            socket << "CONNECT #{host}:#{port} HTTP/1.1\r\n"
 
-          socket << "Host: #{host}:#{port}\r\n"
-
-          if username = @username
-            if password = @password
-              credentials = Base64.strict_encode("#{username}:#{password}")
-              socket << "Proxy-Authorization: Basic #{credentials}\r\n"
-            end
-          end
-
-          socket << "\r\n"
-          socket.flush
-
-          resp = HTTP::Client::Response.from_io(socket, ignore_body: true)
-
-          if resp.success?
-            {% if !flag?(:without_openssl) %}
-              if tls
-                socket = OpenSSL::SSL::Socket::Client.new(socket, context: tls, sync_close: true, hostname: host)
+            @headers.each do |name, values|
+              values.each do |value|
+                socket << "#{name}: #{value}\r\n"
               end
-            {% end %}
-          else
-            socket.close
+            end
 
-            raise IO::Error.new(resp.inspect)
+            socket << "Host: #{host}:#{port}\r\n"
+
+            if username = @username
+              if password = @password
+                credentials = Base64.strict_encode("#{username}:#{password}")
+                socket << "Proxy-Authorization: Basic #{credentials}\r\n"
+              end
+            end
+
+            socket << "\r\n"
+            socket.flush
+
+            resp = HTTP::Client::Response.from_io(socket, ignore_body: true)
+
+            if resp.success?
+              {% if !flag?(:without_openssl) %}
+                if tls
+                  socket = OpenSSL::SSL::Socket::Client.new(socket, context: tls, sync_close: true, hostname: host)
+                end
+              {% end %}
+            else
+              raise IO::Error.new(resp.inspect)
+            end
           end
-        end
 
-        socket
+          socket
+        rescue ex
+          socket.close rescue nil
+          raise ex
+        end
       end
     end
   end
